@@ -5,6 +5,9 @@ import Tasks from "./pages/Tasks";
 import Members from "./pages/Members";
 import Settings from "./pages/Settings";
 import DashboardPage from "./pages/Dashboard";
+import Signup from "./pages/auth/Signup";
+import Login from "./pages/auth/Login";
+import GoogleAuthProvider from "./components/auth/GoogleAuthProvider";
 
 function App() {
   const routes = createBrowserRouter([
@@ -27,6 +30,20 @@ function App() {
         {
           path: "settings",
           element: <Settings />,
+        },
+      ],
+    },
+    {
+      path: "/auth/",
+      element: <GoogleAuthProvider />,
+      children: [
+        {
+          path: "signup",
+          element: <Signup />,
+        },
+        {
+          path: "login",
+          element: <Login />,
         },
       ],
     },
