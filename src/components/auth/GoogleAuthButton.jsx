@@ -1,12 +1,31 @@
 import { useGlobalContext } from "@/context/GlobalContext";
 import { useGoogleLogin } from "@react-oauth/google";
 import { Button } from "../ui/button";
+import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 export default function GoogleAuthButton({ type }) {
-  const {} = useGlobalContext();
+  const { API } = useGlobalContext();
+  const navigate = useNavigate();
   const responseGoogle = async (response) => {
     try {
-      console.log(response);
+      console.log(response, "response", response["code"]);
+      if (response["code"]) {
+        const res = await fetch(`${API}/auth/register/google`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ code: response["code"] }),
+        });
+        const data = await res.json();
+        if (data.status != 201) {
+          toast.error(data.message);
+        } else {
+          toast.success(data.message);
+          navigate("/");
+        }
+      }
     } catch (error) {
       toast.error(error.message);
     }
@@ -17,7 +36,12 @@ export default function GoogleAuthButton({ type }) {
     flow: "auth-code",
   });
   return (
-    <Button onClick={googlePopup} variant="outline" className="w-full">
+    <Button
+      onClick={googlePopup}
+      variant="outline"
+      type="button"
+      className="w-full"
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="48"

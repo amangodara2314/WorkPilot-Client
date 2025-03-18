@@ -3,10 +3,13 @@ import { createContext, useContext } from "react";
 const MainContext = createContext();
 
 export default function GlobalContext({ children }) {
+  const API = import.meta.env.VITE_API_URL;
   const clientId = import.meta.env.VITE_GOOGLE_AUTH_CLIENT_ID;
 
   return (
-    <MainContext.Provider value={{ clientId }}>{children}</MainContext.Provider>
+    <MainContext.Provider value={{ clientId, API }}>
+      {children}
+    </MainContext.Provider>
   );
 }
 
