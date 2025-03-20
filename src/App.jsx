@@ -1,5 +1,8 @@
-import { useState } from "react";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  RouterProvider,
+  useNavigate,
+} from "react-router-dom";
 import MainPage from "./pages/MainPage";
 import Tasks from "./pages/Tasks";
 import Members from "./pages/Members";
@@ -8,9 +11,14 @@ import DashboardPage from "./pages/Dashboard";
 import Signup from "./pages/auth/Signup";
 import Login from "./pages/auth/Login";
 import GoogleAuthProvider from "./components/auth/GoogleAuthProvider";
+import RouteHandler from "./components/RouteHandler";
 
 function App() {
   const routes = createBrowserRouter([
+    {
+      path: "/",
+      element: <RouteHandler />,
+    },
     {
       path: "/workshop/:id/",
       element: <MainPage />,

@@ -1,3 +1,4 @@
+import { Toaster } from "@/components/ui/sonner";
 import { createContext, useContext } from "react";
 
 const MainContext = createContext();
@@ -9,6 +10,7 @@ export default function GlobalContext({ children }) {
   return (
     <MainContext.Provider value={{ clientId, API }}>
       {children}
+      <Toaster richColors="true" />
     </MainContext.Provider>
   );
 }
