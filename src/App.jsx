@@ -18,26 +18,28 @@ function App() {
     {
       path: "/",
       element: <RouteHandler />,
-    },
-    {
-      path: "/workshop/:id/",
-      element: <MainPage />,
       children: [
         {
-          path: "",
-          element: <DashboardPage />,
-        },
-        {
-          path: "tasks",
-          element: <Tasks />,
-        },
-        {
-          path: "members",
-          element: <Members />,
-        },
-        {
-          path: "settings",
-          element: <Settings />,
+          path: "/workshop/:id/",
+          element: <MainPage />,
+          children: [
+            {
+              path: "",
+              element: <DashboardPage />,
+            },
+            {
+              path: "tasks",
+              element: <Tasks />,
+            },
+            {
+              path: "members",
+              element: <Members />,
+            },
+            {
+              path: "settings",
+              element: <Settings />,
+            },
+          ],
         },
       ],
     },

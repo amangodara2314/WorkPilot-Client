@@ -1,11 +1,13 @@
+import { useGlobalContext } from "@/context/GlobalContext";
 import React from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 
 const RouteHandler = () => {
+  const { currentWorkshop } = useGlobalContext();
   const accessToken = sessionStorage.getItem("accessToken");
 
-  if (accessToken && workshopId) {
-    return <Navigate to={`/workshop/dsfaskdjk`} replace />;
+  if (accessToken) {
+    return <Outlet />;
   }
 
   return <Navigate to="/auth/login" replace />;

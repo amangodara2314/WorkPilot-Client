@@ -19,6 +19,7 @@ export default function GoogleAuthButton({ type }) {
           body: JSON.stringify({ code: response["code"] }),
         });
         const data = await res.json();
+        console.log(data);
         if (res.status != 201) {
           toast.error(data.message);
           return;
@@ -46,8 +47,8 @@ export default function GoogleAuthButton({ type }) {
           body: JSON.stringify({ code: response["code"] }),
         });
         const data = await res.json();
+        console.log(data);
         if (res.status != 200) {
-          console.log(data);
           toast.error(data.message || "Something went wrong");
           return;
         } else {

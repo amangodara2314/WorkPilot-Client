@@ -6,10 +6,19 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { Outlet } from "react-router-dom";
+import { Outlet, useParams } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
+import { useGlobalContext } from "@/context/GlobalContext";
+import { useEffect } from "react";
 
 export default function MainPage() {
+  const { setCurrentWorkshop } = useGlobalContext();
+  const params = useParams();
+  useEffect(() => {
+    if (params.id) {
+      setCurrentWorkshop(params.id);
+    }
+  }, [params.id]);
   return (
     <>
       <SidebarProvider>

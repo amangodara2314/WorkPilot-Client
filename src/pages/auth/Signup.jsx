@@ -11,7 +11,7 @@ export default function Signup() {
             <div className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
               <img src="/logo.png" className="w-full h-full" alt="" />
             </div>
-            WorkPilot.
+            Work Pilot.
           </a>
         </div>
         <div className="flex flex-1 items-center justify-center">
