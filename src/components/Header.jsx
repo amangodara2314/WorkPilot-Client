@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Separator } from "./ui/separator";
 import { Link, useLocation } from "react-router-dom";
+import WorkshopLinkTag from "./WorkshopLinkTag";
 
 const Header = () => {
   const location = useLocation();
@@ -34,7 +35,7 @@ const Header = () => {
             <BreadcrumbItem className="hidden md:block text-[15px]">
               {pageHeading ? (
                 <BreadcrumbLink asChild>
-                  <Link to={`/workshop/56sd5a6`}>Dashboard</Link>
+                  <WorkshopLinkTag>Dashboard</WorkshopLinkTag>
                 </BreadcrumbLink>
               ) : (
                 <BreadcrumbPage className="line-clamp-1 ">

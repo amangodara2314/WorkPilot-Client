@@ -53,28 +53,6 @@ const data = {
       plan: "Free",
     },
   ],
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "/workshop/sadf56/",
-      icon: <LayoutDashboard />,
-    },
-    {
-      title: "Tasks",
-      url: "/workshop/sadf56/tasks",
-      icon: <CircleCheck />,
-    },
-    {
-      title: "Members",
-      url: "/workshop/ksjdfh/members",
-      icon: <Users />,
-    },
-    {
-      title: "Settings",
-      url: "/workshop/ksjdfh/settings",
-      icon: <SettingsIcon />,
-    },
-  ],
   projects: [
     {
       name: "Project Management & Task Tracking",
@@ -136,7 +114,7 @@ export function AppSidebar({ ...props }) {
         <WorkshopSwitcher workshops={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain />
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>

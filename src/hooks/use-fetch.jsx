@@ -11,7 +11,8 @@ const useFetch = (
       Authorization:
         "Bearer " + JSON.parse(sessionStorage.getItem("accessToken")),
     },
-  }
+  },
+  initialFetch = true
 ) => {
   const { API } = useGlobalContext();
   const [data, setData] = useState(null);
@@ -35,12 +36,13 @@ const useFetch = (
         sessionStorage.removeItem("accessToken");
         navigate("/auth/login");
       }
+      const result = await response.json();
+      console.log(response, result);
 
       if (!response.ok) {
-        throw new Error(`Error: ${response.status} - ${response.statusText}`);
+        throw new Error(`${result.message}`);
       }
 
-      const result = await response.json();
       setData(result);
     } catch (err) {
       setError(err.message);
@@ -50,7 +52,9 @@ const useFetch = (
   }, [url]);
 
   useEffect(() => {
-    fetchData();
+    if (initialFetch) {
+      fetchData();
+    }
   }, [fetchData]);
 
   return { data, error, loading, refetch: fetchData };

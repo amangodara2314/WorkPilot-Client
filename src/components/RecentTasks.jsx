@@ -35,7 +35,7 @@ export default function RecentTasks({ tasks = [] }) {
       <CardContent>
         <div className="space-y-4">
           {tasks.length === 0 && (
-            <div className="text-sm text-muted-foreground w-full text-center my-24 font-semibold">
+            <div className="text-sm text-muted-foreground w-full text-center my-24">
               <span>No tasks found</span>
             </div>
           )}

@@ -33,7 +33,7 @@ export default function RecentMembers({ members = [] }) {
       <CardContent>
         <div className="space-y-4">
           {members.length === 0 && (
-            <div className="text-sm text-muted-foreground w-full text-center my-24 font-semibold">
+            <div className="text-sm text-muted-foreground w-full text-center my-24">
               <span>No members found</span>
             </div>
           )}
