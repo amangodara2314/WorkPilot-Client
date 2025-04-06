@@ -24,13 +24,17 @@ export function NavMain() {
   const { currentWorkshop } = useGlobalContext();
   const location = useLocation();
 
+  const normalizedPath = location.pathname.endsWith("/")
+    ? location.pathname.slice(0, -1)
+    : location.pathname;
+
   return (
     <SidebarMenu className="px-2">
       {items.map((item) => {
         const isActive =
           item.title === "Dashboard"
-            ? location.pathname === "/workshop/" + currentWorkshop + "/"
-            : location.pathname.includes(item.title.toLowerCase());
+            ? normalizedPath === "/workshop/" + currentWorkshop
+            : normalizedPath.includes(item.title.toLowerCase());
 
         return (
           <SidebarMenuItem key={item.title}>

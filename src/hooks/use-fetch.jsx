@@ -5,7 +5,7 @@ import { toast } from "sonner";
 
 const useFetch = (
   url,
-  options = {
+  initialOptions = {
     method: "GET",
     headers: {
       Authorization:
@@ -20,42 +20,58 @@ const useFetch = (
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const fetchData = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  const fetchData = useCallback(
+    async (customBody = null) => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      const response = await fetch(API + url, options);
+      try {
+        // Create a new options object to avoid mutating the original
+        const options = { ...initialOptions };
 
-      if (response.status === 401) {
-        toast.error("Session expired. Please login again", {
-          description:
-            "There is something wrong with your session. Please login again to continue",
-          duration: 7000,
-        });
-        sessionStorage.removeItem("accessToken");
-        navigate("/auth/login");
+        // If a custom body is provided, use it
+        if (customBody !== null) {
+          options.body = JSON.stringify(customBody);
+        }
+
+        const response = await fetch(API + url, options);
+        console.log("response", response);
+
+        if (response.status === 401) {
+          toast.error("Session expired. Please login again", {
+            description:
+              "There is something wrong with your session. Please login again to continue",
+            duration: 7000,
+          });
+          sessionStorage.removeItem("accessToken");
+          navigate("/auth/login");
+          return;
+        }
+
+        const result = await response.json();
+        console.log(response, result);
+
+        if (!response.ok) {
+          throw new Error(result.message || "Request failed");
+        }
+
+        setData(result);
+        return result;
+      } catch (err) {
+        setError(err.message);
+        return null;
+      } finally {
+        setLoading(false);
       }
-      const result = await response.json();
-      console.log(response, result);
-
-      if (!response.ok) {
-        throw new Error(`${result.message}`);
-      }
-
-      setData(result);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [url]);
+    },
+    [API, url, navigate]
+  );
 
   useEffect(() => {
     if (initialFetch) {
       fetchData();
     }
-  }, [fetchData]);
+  }, [fetchData, initialFetch]);
 
   return { data, error, loading, refetch: fetchData };
 };

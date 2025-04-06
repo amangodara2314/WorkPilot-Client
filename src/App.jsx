@@ -12,6 +12,9 @@ import Signup from "./pages/auth/Signup";
 import Login from "./pages/auth/Login";
 import GoogleAuthProvider from "./components/auth/GoogleAuthProvider";
 import RouteHandler from "./components/RouteHandler";
+import getWorkshops from "./hooks/get-workshops";
+import { useGlobalContext } from "./context/GlobalContext";
+import { useEffect } from "react";
 
 function App() {
   const routes = createBrowserRouter([

@@ -28,6 +28,7 @@ import {
 } from "../ui/sidebar";
 import { WorkshopSwitcher } from "./WorkshopSwitcher";
 import Settings from "@/pages/Settings";
+import { useGlobalContext } from "@/context/GlobalContext";
 
 // This is sample data.
 const data = {
@@ -111,7 +112,7 @@ export function AppSidebar({ ...props }) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <WorkshopSwitcher workshops={data.teams} />
+        <WorkshopSwitcher />
       </SidebarHeader>
       <SidebarContent>
         <NavMain />
