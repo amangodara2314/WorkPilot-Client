@@ -33,8 +33,7 @@ import { Skeleton } from "../ui/skeleton";
 export function NavProjects() {
   const { isMobile } = useSidebar();
   const [isOpen, setIsOpen] = useState(false);
-  const { currentWorkshop } = useGlobalContext();
-  const [projects, setProjects] = useState(null);
+  const { currentWorkshop, setProjects, projects } = useGlobalContext();
   const { data, error, loading, refetch } = useFetch(
     "/project/" + currentWorkshop,
     {

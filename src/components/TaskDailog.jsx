@@ -7,7 +7,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import CreateTaskForm from "./CreateTask";
+import CreateEditTaskForm from "./CreateEditTask";
 const TaskDialog = (props) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -21,7 +21,7 @@ const TaskDialog = (props) => {
           </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-          <CreateTaskForm onClose={() => setIsOpen(false)} />
+          <CreateEditTaskForm onClose={() => setIsOpen(false)} />
         </DialogContent>
       </Dialog>
     </div>

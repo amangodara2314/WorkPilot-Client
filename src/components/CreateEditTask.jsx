@@ -30,27 +30,11 @@ import {
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import useFetch from "@/hooks/use-fetch";
+import { useEffect } from "react";
+import { toast } from "sonner";
+import { useGlobalContext } from "@/context/GlobalContext";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
-// Mock data for demonstration
-const mockProjects = [
-  { id: "1", name: "Website Redesign" },
-  { id: "2", name: "Mobile App" },
-  { id: "3", name: "API Integration" },
-];
-
-const mockUsers = [
-  { id: "1", name: "John Doe" },
-  { id: "2", name: "Jane Smith" },
-  { id: "3", name: "Alex Johnson" },
-];
-
-const mockWorkshops = [
-  { id: "1", name: "Frontend Workshop" },
-  { id: "2", name: "Backend Workshop" },
-  { id: "3", name: "Design Workshop" },
-];
-
-// Form schema based on the Mongoose model
 const taskFormSchema = z.object({
   title: z.string().min(2, {
     message: "Title must be at least 2 characters.",
@@ -64,7 +48,9 @@ const taskFormSchema = z.object({
   project: z.string({
     required_error: "Please select a project.",
   }),
-  assignedTo: z.string().optional(),
+  assignedTo: z.string({
+    required_error: "Please select a member.",
+  }),
   status: z
     .enum(["in-review", "in-progress", "backlog", "completed", "pending"], {
       required_error: "Please select a status.",
@@ -76,34 +62,111 @@ const taskFormSchema = z.object({
     })
     .default("low"),
   dueDate: z.date().optional(),
-  workshop: z.string({
-    required_error: "Please select a workshop.",
-  }),
 });
 
-export default function CreateTaskForm({ onClose }) {
+export default function CreateEditTaskForm({
+  onClose,
+  task = null,
+  isEditing = false,
+}) {
+  console.log(task);
   const form = useForm({
     resolver: zodResolver(taskFormSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      status: "pending",
-      priority: "low",
+      title: task ? task.title : "",
+      description: task ? task.description : "",
+      status: task ? task.status : "pending",
+      priority: task ? task.priority : "low",
+      batch: task ? task.batch : "Other",
+      project: task ? task.project : "",
+      assignedTo: task ? (task.assignedTo ? task.assignedTo._id : "") : "",
+      dueDate: task
+        ? task.dueDate
+          ? new Date(task.dueDate)
+          : undefined
+        : null,
     },
   });
 
+  const url = isEditing && task ? "/task/" + task._id : "/task";
+  const method = isEditing && task ? "PUT" : "POST";
+  const { projects, members, setMembers, currentWorkshop, setTasks } =
+    useGlobalContext();
+
+  const {
+    data: res,
+    error,
+    loading,
+    refetch,
+  } = useFetch(
+    url,
+    {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization:
+          "Bearer " + JSON.parse(sessionStorage.getItem("accessToken")),
+      },
+    },
+    false
+  );
+
+  const {
+    data: userData,
+    error: userError,
+    loading: userLoading,
+    refetch: userRefetch,
+  } = useFetch(
+    "/member/" + currentWorkshop,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization:
+          "Bearer " + JSON.parse(sessionStorage.getItem("accessToken")),
+      },
+    },
+    false
+  );
+
+  useEffect(() => {
+    if (res) {
+      if (isEditing) {
+        setTasks((prev) =>
+          prev.map((t) => (t._id === task._id ? res.task : t))
+        );
+      }
+      toast.success(`Task ${isEditing ? "updated" : "created"} successfully!`);
+      form.reset();
+      if (onClose) onClose();
+    }
+    if (error) {
+      toast.error(error || "Something went wrong");
+    }
+  }, [res, error]);
   function onSubmit(data) {
-    const { data: res, error, loading } = useFetch("/task");
-    alert("Task created successfully!");
-    form.reset();
-    if (onClose) onClose();
+    refetch({ ...data, workshop: currentWorkshop });
   }
 
+  useEffect(() => {
+    if (!members) {
+      userRefetch();
+    }
+  }, []);
+
+  useEffect(() => {
+    if (userData) {
+      setMembers(userData.members);
+    }
+    if (userError) {
+      toast.error(userError.message || "Failed to fetch members");
+    }
+  }, [userData, userError]);
   return (
     <div className="space-y-4">
       <div className="mb-5 pb-2 border-b">
         <h1 className="text-xl tracking-[-0.16px] dark:text-[#fcfdffef] font-semibold mb-1">
-          Create Task
+          {isEditing ? "Edit Task" : "Create Task"}
         </h1>
         <p className="text-muted-foreground text-sm leading-tight">
           Organize and manage tasks, resources, and team collaboration
@@ -155,7 +218,7 @@ export default function CreateTaskForm({ onClose }) {
                 <FormLabel>Batch Type</FormLabel>
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  defaultValue={task ? task.batch : ""}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -191,38 +254,13 @@ export default function CreateTaskForm({ onClose }) {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {mockProjects.map((project) => (
-                      <SelectItem key={project.id} value={project.id}>
-                        {project.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Workshop Field */}
-          <FormField
-            control={form.control}
-            name="workshop"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Workshop</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select workshop" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {mockWorkshops.map((workshop) => (
-                      <SelectItem key={workshop.id} value={workshop.id}>
-                        {workshop.name}
+                    {projects?.map((project) => (
+                      <SelectItem
+                        className="truncate"
+                        key={project._id}
+                        value={project._id}
+                      >
+                        {project.emoji} {project.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -305,16 +343,34 @@ export default function CreateTaskForm({ onClose }) {
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {mockUsers.map((user) => (
-                      <SelectItem key={user.id} value={user.id}>
-                        {user.name}
+                    {userLoading && (
+                      <div className="h-10 animate-pulse text-center">
+                        Loading...
+                      </div>
+                    )}
+                    {members?.map((member) => (
+                      <SelectItem
+                        className=""
+                        key={member._id}
+                        value={member.user._id}
+                      >
+                        <div className="flex items-center gap-2 text-secondary-foreground font-semibold">
+                          <Avatar className="h-7 w-7 rounded-full">
+                            <AvatarImage
+                              src={member.user.profileImage}
+                              alt={member.user.name}
+                            />
+                            <AvatarFallback className="rounded-full">
+                              {member.user.name[0].toUpperCase()}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span>{member.user.name}</span>
+                        </div>
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                <FormDescription>
-                  Optional: Leave empty for unassigned tasks
-                </FormDescription>
+
                 <FormMessage />
               </FormItem>
             )}
@@ -366,7 +422,13 @@ export default function CreateTaskForm({ onClose }) {
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit">Create Task</Button>
+            <Button disabled={loading} type="submit">
+              {loading
+                ? `${
+                    task && isEditing ? "Updating Task..." : "Creating Task..."
+                  }`
+                : `${task && isEditing ? "Update Task" : "Create Task"}`}
+            </Button>
           </div>
         </form>
       </Form>

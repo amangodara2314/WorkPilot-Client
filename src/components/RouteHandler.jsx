@@ -1,16 +1,19 @@
 import { useGlobalContext } from "@/context/GlobalContext";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Navigate, Outlet, useNavigate } from "react-router-dom";
+import { SpinningText } from "@/components/magicui/spinning-text";
 
 const RouteHandler = () => {
-  const { currentWorkshop, API, setCurrentWorkshop, setUser } =
+  const { setCurrentWorkshopDetails, API, setCurrentWorkshop, setUser } =
     useGlobalContext();
   const accessToken = sessionStorage.getItem("accessToken");
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (accessToken) {
       const getUser = async () => {
+        setLoading(true);
         try {
           const response = await fetch(`${API}/user`, {
             method: "GET",
@@ -19,16 +22,19 @@ const RouteHandler = () => {
             },
           });
           const result = await response.json();
-          setCurrentWorkshop(result.user.currentWorkshop);
+          setCurrentWorkshop(result.user.currentWorkshop._id);
+          setCurrentWorkshopDetails(result.user.currentWorkshop);
           setUser(result.user);
 
           if (result.user.currentWorkshop) {
             if (window.location.pathname === "/") {
-              navigate(`/workshop/${result.user.currentWorkshop}`);
+              navigate(`/workshop/${result.user.currentWorkshop._id}`);
             }
           }
         } catch (error) {
           console.log(error);
+        } finally {
+          setLoading(false);
         }
       };
       getUser();
@@ -37,6 +43,14 @@ const RouteHandler = () => {
 
   if (!accessToken) {
     return <Navigate to="/auth/login" replace />;
+  }
+
+  if (loading) {
+    return (
+      <div className="fixed w-full h-full flex items-center justify-center">
+        <SpinningText>beautiful • things awaits • you •</SpinningText>
+      </div>
+    );
   }
 
   return <Outlet />;

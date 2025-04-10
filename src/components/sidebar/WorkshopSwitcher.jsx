@@ -23,12 +23,19 @@ import { DialogTrigger } from "@radix-ui/react-dialog";
 import CreateWorkshopForm from "../CreateWorkshop";
 import { Dialog, DialogContent } from "../ui/dialog";
 import { useNavigate } from "react-router-dom";
+import { set } from "date-fns";
 export function WorkshopSwitcher({}) {
   const { isMobile } = useSidebar();
-  const { currentWorkshop, setCurrentWorkshop, setWorkshops, workshops, API } =
-    useGlobalContext();
+  const {
+    currentWorkshop,
+    setCurrentWorkshop,
+    setCurrentWorkshopDetails,
+    setWorkshops,
+    workshops,
+    currentWorkshopDetails,
+    API,
+  } = useGlobalContext();
   const { data, error } = getWorkshops();
-  const [activeWorkshop, setActiveWorkshop] = React.useState(null);
   const [isOpen, setIsOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const navigate = useNavigate();
@@ -37,9 +44,9 @@ export function WorkshopSwitcher({}) {
     console.log(data, error);
     if (data) {
       setWorkshops(data.workshops);
-      setActiveWorkshop(
-        data.workshops.find((w) => w.workshop._id === currentWorkshop)
-      );
+      // setCurrentWorkshopDetails(
+      //   data.workshops.find((w) => w.workshop._id === currentWorkshop)
+      // );
     }
     if (error) {
       toast.error(
@@ -51,7 +58,6 @@ export function WorkshopSwitcher({}) {
   const changeWorkshop = async (id) => {
     setIsLoading(true);
 
-    // Define the promise that toast.promise will track
     const workshopPromise = fetch(`${API}/workshop/change/${id}`, {
       method: "PATCH",
       headers: {
@@ -64,7 +70,9 @@ export function WorkshopSwitcher({}) {
         throw new Error(result.message || "Something went wrong");
       }
       setCurrentWorkshop(id);
-      setActiveWorkshop(data.workshops.find((w) => w.workshop._id === id));
+      setCurrentWorkshopDetails(
+        data.workshops.find((w) => w.workshop._id === id)
+      );
       navigate("/workshop/" + id);
       return result;
     });
@@ -84,11 +92,11 @@ export function WorkshopSwitcher({}) {
     }
   };
 
-  if (!data || !workshops || !activeWorkshop) {
+  if (!data || !workshops || !currentWorkshopDetails) {
     return (
       <SidebarMenu>
         <SidebarMenuItem>
-          <Skeleton className="h-10 w-full" />
+          <Skeleton className="h-10 w-full mt-2" />
         </SidebarMenuItem>
       </SidebarMenu>
     );
@@ -107,7 +115,9 @@ export function WorkshopSwitcher({}) {
               </div> */}
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate text-primary font-semibold">
-                  {activeWorkshop?.workshop.name}
+                  {currentWorkshopDetails?.name
+                    ? currentWorkshopDetails?.name
+                    : currentWorkshopDetails?.workshop?.name}
                 </span>
                 <span className="truncate text-xs">Free</span>
               </div>
@@ -156,7 +166,11 @@ export function WorkshopSwitcher({}) {
 
             <Dialog modal={true} open={isOpen} onOpenChange={setIsOpen}>
               <DialogContent className="cursor-pointer sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-                <CreateWorkshopForm onClose={() => setIsOpen(false)} />
+                <CreateWorkshopForm
+                  onClose={() => setIsOpen(false)}
+                  workshop={workshops}
+                  setWorkshops={setWorkshops}
+                />
               </DialogContent>
             </Dialog>
           </DropdownMenuContent>

@@ -21,20 +21,18 @@ const useFetch = (
   const navigate = useNavigate();
 
   const fetchData = useCallback(
-    async (customBody = null) => {
+    async (customBody = null, customUrl = url, customLogic = () => {}) => {
       setLoading(true);
       setError(null);
 
       try {
-        // Create a new options object to avoid mutating the original
         const options = { ...initialOptions };
 
-        // If a custom body is provided, use it
         if (customBody !== null) {
           options.body = JSON.stringify(customBody);
         }
 
-        const response = await fetch(API + url, options);
+        const response = await fetch(API + customUrl, options);
         console.log("response", response);
 
         if (response.status === 401) {
@@ -54,6 +52,7 @@ const useFetch = (
         if (!response.ok) {
           throw new Error(result.message || "Request failed");
         }
+        customLogic();
 
         setData(result);
         return result;

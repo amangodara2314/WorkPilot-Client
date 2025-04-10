@@ -1,34 +1,63 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import { Pencil, Save, Trash2 } from "lucide-react";
+
 import { toast } from "sonner";
+import { useGlobalContext } from "@/context/GlobalContext";
+import useFetch from "@/hooks/use-fetch";
+import DeleteWorkshopButton from "@/components/DeleteWorkshopButton";
 
 export default function Settings() {
-  const [workshopName, setWorkshopName] = useState("Advanced React Workshop");
-  const [description, setDescription] = useState(
-    "A comprehensive workshop covering advanced React concepts, state management, and performance optimization techniques."
+  const {
+    currentWorkshopDetails,
+    currentWorkshop,
+    setCurrentWorkshop,
+    setCurrentWorkshopDetails,
+  } = useGlobalContext();
+  const [workshopName, setWorkshopName] = useState("");
+  const [description, setDescription] = useState("");
+
+  useEffect(() => {
+    if (currentWorkshopDetails) {
+      setWorkshopName(currentWorkshopDetails.name);
+      setDescription(currentWorkshopDetails.description);
+    }
+  }, [currentWorkshopDetails]);
+
+  const { data, error, loading, refetch } = useFetch(
+    "/workshop/" + currentWorkshop,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization:
+          "Bearer " + JSON.parse(sessionStorage.getItem("accessToken")),
+      },
+      body: JSON.stringify({ name: workshopName, description }),
+    },
+    false
   );
 
+  useEffect(() => {
+    if (data) {
+      console.log(data);
+      setCurrentWorkshopDetails(data.workshop);
+      setCurrentWorkshop(data.workshop._id);
+      setWorkshopName(data.workshop.name);
+      setDescription(data.workshop.description);
+      toast.success("Workshop updated successfully!", {
+        description: "Your workshop details have been updated successfully.",
+      });
+    }
+    if (error) {
+      toast.error(error || "Something went wrong");
+    }
+  }, [data, error]);
   const handleSave = () => {
-    toast({
-      title: "Changes saved",
-      description: "Your workshop details have been updated successfully.",
-    });
+    refetch({ name: workshopName, description });
   };
 
   return (
@@ -55,6 +84,7 @@ export default function Settings() {
               value={workshopName}
               onChange={(e) => setWorkshopName(e.target.value)}
               className="max-w-[600px]"
+              placeholder="Enter your workshop name"
             />
             <p className="text-[13px] text-muted-foreground">
               This is the name that will be displayed to all workshop
@@ -69,6 +99,7 @@ export default function Settings() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               className="min-h-[150px]"
+              placeholder="Provide a detailed description of your workshop, including its objectives, target audience, and expected outcomes."
             />
             <p className="text-[13px] text-muted-foreground">
               Provide a detailed description of your workshop, including its
@@ -77,43 +108,13 @@ export default function Settings() {
           </div>
 
           <div className="flex items-center justify-end  gap-4">
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="destructive"
-                  className="flex items-center gap-2"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Delete Workshop
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete
-                    your workshop and remove all associated data including:
-                    <ul className="list-disc ml-6 mt-2">
-                      <li>All projects within this workshop</li>
-                      <li>All tasks and their progress</li>
-                      <li>All member associations and permissions</li>
-                      <li>All workshop resources and materials</li>
-                    </ul>
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction className="bg-destructive text-destructive-foreground">
-                    Delete Workshop
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
+            <DeleteWorkshopButton />
             <Button
               onClick={handleSave}
+              disabled={loading}
               className="bg-[#18181B] text-white hover:bg-[#18181B]/90"
             >
-              Save Changes
+              {loading ? "Saving Changes..." : "Save Changes"}
             </Button>
           </div>
         </div>
