@@ -15,6 +15,7 @@ import RouteHandler from "./components/RouteHandler";
 import getWorkshops from "./hooks/get-workshops";
 import { useGlobalContext } from "./context/GlobalContext";
 import { useEffect } from "react";
+import ShowTask from "./pages/ShowTask";
 
 function App() {
   const routes = createBrowserRouter([
@@ -33,6 +34,10 @@ function App() {
             {
               path: "tasks",
               element: <Tasks />,
+            },
+            {
+              path: "tasks/:taskId",
+              element: <ShowTask />,
             },
             {
               path: "members",

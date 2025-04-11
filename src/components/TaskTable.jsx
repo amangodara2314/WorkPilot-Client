@@ -29,6 +29,9 @@ import { toast } from "sonner";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Dialog, DialogContent } from "./ui/dialog";
 import CreateEditTaskForm from "./CreateEditTask";
+import DeleteTask from "./DeleteTask";
+import { Link } from "react-router-dom";
+import WorkshopLinkTag from "./WorkshopLinkTag";
 
 export default function TaskTable() {
   const {
@@ -567,8 +570,23 @@ export default function TaskTable() {
                             >
                               Edit
                             </DropdownMenuItem>
-                            <DropdownMenuItem>View Details</DropdownMenuItem>
-                            <DropdownMenuItem>Delete</DropdownMenuItem>
+                            <DeleteTask
+                              id={task._id}
+                              refetch={() =>
+                                refetch(
+                                  null,
+                                  "/task?" +
+                                    new URLSearchParams(
+                                      buildQueryParams(currentPage)
+                                    )
+                                )
+                              }
+                            ></DeleteTask>
+                            <DropdownMenuItem>
+                              <WorkshopLinkTag path={`tasks/${task._id}`}>
+                                View Details
+                              </WorkshopLinkTag>
+                            </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </td>

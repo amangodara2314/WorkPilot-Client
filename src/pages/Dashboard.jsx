@@ -157,7 +157,7 @@ export default function DashboardPage() {
   }
 
   if (error) {
-    toast.error(error.message);
+    toast.error(error);
   }
   return (
     <div className="flex flex-col">
