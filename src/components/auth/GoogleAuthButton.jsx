@@ -9,7 +9,6 @@ export default function GoogleAuthButton({ type }) {
   const navigate = useNavigate();
   const registerWithGoogle = async (response) => {
     try {
-      console.log(response, "response", response["code"]);
       if (response["code"]) {
         const res = await fetch(`${API}/auth/register/google`, {
           method: "POST",
@@ -19,7 +18,6 @@ export default function GoogleAuthButton({ type }) {
           body: JSON.stringify({ code: response["code"] }),
         });
         const data = await res.json();
-        console.log(data);
         if (res.status != 201) {
           toast.error(data.message);
           return;
@@ -37,7 +35,6 @@ export default function GoogleAuthButton({ type }) {
   };
   const loginWithGoogle = async (response) => {
     try {
-      console.log(response, "response", response["code"]);
       if (response["code"]) {
         const res = await fetch(`${API}/auth/login/google`, {
           method: "POST",
@@ -47,7 +44,6 @@ export default function GoogleAuthButton({ type }) {
           body: JSON.stringify({ code: response["code"] }),
         });
         const data = await res.json();
-        console.log(data);
         if (res.status != 200) {
           toast.error(data.message || "Something went wrong");
           return;

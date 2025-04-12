@@ -86,7 +86,7 @@ export function WorkshopSwitcher({}) {
     try {
       await workshopPromise;
     } catch (error) {
-      console.log(error);
+      toast.error(error.message);
     } finally {
       setIsLoading(false);
     }

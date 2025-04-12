@@ -42,8 +42,8 @@ const taskFormSchema = z.object({
   description: z.string().min(10, {
     message: "Description must be at least 10 characters.",
   }),
-  batch: z.enum(["Bug", "Feature", "Documentation", "Other"], {
-    required_error: "Please select a batch type.",
+  badge: z.enum(["Bug", "Feature", "Documentation", "Other"], {
+    required_error: "Please select a badge type.",
   }),
   project: z.string({
     required_error: "Please select a project.",
@@ -68,6 +68,7 @@ export default function CreateEditTaskForm({
   onClose,
   task = null,
   isEditing = false,
+  callback = () => {},
 }) {
   console.log(task);
   const form = useForm({
@@ -77,8 +78,12 @@ export default function CreateEditTaskForm({
       description: task ? task.description : "",
       status: task ? task.status : "pending",
       priority: task ? task.priority : "low",
-      batch: task ? task.batch : "Other",
-      project: task ? task.project : "",
+      badge: task ? task.badge : "Other",
+      project: task
+        ? typeof task.project === "string"
+          ? task.project
+          : task.project?._id
+        : "",
       assignedTo: task ? (task.assignedTo ? task.assignedTo._id : "") : "",
       dueDate: task
         ? task.dueDate
@@ -132,10 +137,11 @@ export default function CreateEditTaskForm({
   useEffect(() => {
     if (res) {
       if (isEditing) {
-        setTasks((prev) =>
-          prev.map((t) => (t._id === task._id ? res.task : t))
+        setTasks((prev = []) =>
+          prev?.map((t) => (t._id === task._id ? res.task : t))
         );
       }
+      callback(res);
       toast.success(`Task ${isEditing ? "updated" : "created"} successfully!`);
       form.reset();
       if (onClose) onClose();
@@ -209,20 +215,19 @@ export default function CreateEditTaskForm({
             )}
           />
 
-          {/* Batch Field */}
           <FormField
             control={form.control}
-            name="batch"
+            name="badge"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Batch Type</FormLabel>
+                <FormLabel>Badge Type</FormLabel>
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={task ? task.batch : ""}
+                  defaultValue={task ? task.badge : ""}
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select batch type" />
+                      <SelectValue placeholder="Select badge type" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -237,7 +242,6 @@ export default function CreateEditTaskForm({
             )}
           />
 
-          {/* Project Field */}
           <FormField
             control={form.control}
             name="project"

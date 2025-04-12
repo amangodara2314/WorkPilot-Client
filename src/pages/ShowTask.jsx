@@ -11,17 +11,23 @@ import {
   FolderKanban,
   ArrowRight,
   Badge,
+  Info,
+  SquarePen,
 } from "lucide-react";
 import useFetch from "@/hooks/use-fetch";
 import { useParams } from "react-router-dom";
 import { TaskSkeleton } from "@/components/TaskSkeleton";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import CreateEditTaskForm from "@/components/CreateEditTask";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 function ShowTask() {
   const params = useParams();
+  const [open, setOpen] = useState(false);
 
-  const { data, error, loading } = useFetch(
+  const { data, error, loading, refetch } = useFetch(
     "/task/" + params.taskId + "?workshopId=" + params.id,
     {
       headers: {
@@ -31,31 +37,6 @@ function ShowTask() {
     },
     true
   );
-
-  const task = {
-    taskCode: "TASK-001",
-    title: "Implement User Authentication",
-    description:
-      "Add user authentication functionality using JWT tokens and implement secure password hashing. This includes setting up the authentication middleware, creating user registration and login endpoints, and implementing password reset functionality.",
-    batch: "Feature",
-    status: "in-progress",
-    priority: "high",
-    dueDate: new Date("2024-03-01"),
-    assignedTo: {
-      name: "John Doe",
-      avatar: "https://github.com/shadcn.png",
-    },
-    project: {
-      name: "Project Alpha",
-      description: "Main project for the company's core product",
-    },
-    workshop: {
-      name: "Backend Development",
-      description: "Core backend infrastructure team",
-    },
-    comments: 5,
-    activity: 12,
-  };
 
   const statusColors = {
     "in-review": "bg-yellow-100 text-yellow-800",
@@ -83,22 +64,44 @@ function ShowTask() {
   }
   return (
     <div className="min-h-screen">
+      <Dialog modal={true} open={open} onOpenChange={setOpen}>
+        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+          <CreateEditTaskForm
+            task={data?.task}
+            isEditing={true}
+            onClose={() => setOpen(false)}
+            callback={(res) => {
+              refetch();
+            }}
+          />
+        </DialogContent>
+      </Dialog>
       <main className="max-w-[1800px] mx-auto px-6 py-8">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-8 flex items-center justify-between"
         >
-          <h1 className="text-2xl font-semibold text-gray-900 mb-2">
-            {data.task?.title}
-          </h1>
+          <div className="flex items-center gap-2 truncate">
+            {" "}
+            <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+              {data.task?.title}
+            </h1>
+            <button onClick={() => setOpen(true)} className="text-gray-900">
+              <SquarePen />
+            </button>
+          </div>
           <div className="flex items-center gap-3">
             <span className="px-2 py-1 text-xs rounded-full bg-gray-200 text-gray-800">
               {data.task?.taskCode}
             </span>{" "}
-            <span className="px-2 py-1 text-xs rounded-full bg-gray-200 text-gray-800">
-              {data.task?.batch}
-            </span>{" "}
+            <span
+              className={`px-2 py-1 text-xs rounded-full capitalize ${
+                statusColors[data.task?.status]
+              } text-gray-800`}
+            >
+              {data.task?.status}
+            </span>
           </div>
         </motion.div>
 
@@ -123,10 +126,10 @@ function ShowTask() {
                 </div>
                 <div className="space-y-2">
                   <p className="text-sm font-medium">
-                    {data.task?.project.name}
+                    {data.task?.project?.name || "N/A"}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {data.task?.project.description}
+                    {data.task?.project?.description || "N/A"}
                   </p>
                 </div>
               </div>
@@ -134,18 +137,35 @@ function ShowTask() {
               <div className="bg-white rounded-lg border p-6 flex-1">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-sm font-medium text-gray-500">
-                    Workshop
+                    Assigned To
                   </h2>
                   <Users className="h-4 w-4 text-gray-400" />
                 </div>
-                <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Avatar className="h-8 w-8 rounded-full">
+                    <AvatarImage
+                      src={data.task?.assignedTo?.profileImage}
+                      alt={data.task?.assignedTo?.name}
+                    />
+                    <AvatarFallback className="rounded-full">CN</AvatarFallback>
+                  </Avatar>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-semibold">
+                      {data.task?.assignedTo?.name}
+                    </span>
+                    <span className="truncate text-xs">
+                      {data.task?.assignedTo?.email}
+                    </span>
+                  </div>
+                </div>
+                {/* <div className="space-y-2">
                   <p className="text-sm font-medium">
-                    {data.task?.workshop.name}
+                    {data.task?.assignedTo?.name || "N/A"}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {data.task?.workshop.description}
+                    {data.task?.assignedTo?.email || "N/A"}
                   </p>
-                </div>
+                </div> */}
               </div>
             </div>
 
@@ -194,22 +214,6 @@ function ShowTask() {
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <Users className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm">Assigned to</span>
-                  </div>
-                  <Avatar className="h-6 w-6">
-                    <AvatarImage src={data.task?.assignedTo.avatar} />
-                    <AvatarFallback>
-                      {data.task?.assignedTo.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                </div>
-                <Separator />
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
                     <CalendarDays className="h-4 w-4 text-gray-500" />
                     <span className="text-sm">Due Date</span>
                   </div>
@@ -220,10 +224,22 @@ function ShowTask() {
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <Badge className="h-4 w-4 text-gray-500" />
-                    <span className="text-sm">Batch</span>
+                    <Info
+                      className={`h-4 w-4 ${statusColors[data.task?.status]}`}
+                    />
+                    <span className="text-sm">Status</span>
                   </div>
-                  <span className="text-sm">{data.task?.batch}</span>
+                  <span className="text-sm capitalize">
+                    {data.task?.status}
+                  </span>
+                </div>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Badge className="h-4 w-4 text-gray-500" />
+                    <span className="text-sm">Badge</span>
+                  </div>
+                  <span className="text-sm">{data.task?.badge}</span>
                 </div>
               </div>
             </div>

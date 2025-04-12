@@ -16,6 +16,7 @@ import getWorkshops from "./hooks/get-workshops";
 import { useGlobalContext } from "./context/GlobalContext";
 import { useEffect } from "react";
 import ShowTask from "./pages/ShowTask";
+import Project from "./pages/Project";
 
 function App() {
   const routes = createBrowserRouter([
@@ -46,6 +47,10 @@ function App() {
             {
               path: "settings",
               element: <Settings />,
+            },
+            {
+              path: "project/:projectId",
+              element: <Project />,
             },
           ],
         },
