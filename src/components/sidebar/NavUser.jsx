@@ -25,10 +25,17 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { useGlobalContext } from "@/context/GlobalContext";
+import { useNavigate } from "react-router-dom";
 
-export function NavUser({ user }) {
+export function NavUser() {
   const { isMobile } = useSidebar();
-
+  const { user } = useGlobalContext();
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    sessionStorage.removeItem("accessToken");
+    navigate("/auth/login");
+  };
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -39,7 +46,7 @@ export function NavUser({ user }) {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.avatar} alt={user.name} />
+                <AvatarImage src={user.profileImage} alt={user.name} />
                 <AvatarFallback className="rounded-lg">CN</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
@@ -56,7 +63,10 @@ export function NavUser({ user }) {
             sideOffset={4}
           >
             <DropdownMenuLabel className="p-0 font-normal"></DropdownMenuLabel>
-            <DropdownMenuItem className="cursor-pointer hover:text-red-500">
+            <DropdownMenuItem
+              onClick={() => handleLogout()}
+              className="cursor-pointer hover:text-red-500"
+            >
               <LogOut />
               Log out
             </DropdownMenuItem>

@@ -16,7 +16,6 @@ import useFetch from "@/hooks/use-fetch";
 import { useState, useRef, useEffect } from "react";
 import EmojiPicker from "emoji-picker-react";
 import { toast } from "sonner";
-import { useGlobalContext } from "@/context/GlobalContext";
 
 const projectFormSchema = z.object({
   name: z.string().min(2, {
@@ -28,13 +27,19 @@ const projectFormSchema = z.object({
   emoji: z.string().optional(),
 });
 
-export default function CreateProjectForm({ setProjects, onClose }) {
+export default function CreateEditProject({
+  project = null,
+  setProjects,
+  onClose,
+  mode = "create",
+  callback = () => {},
+}) {
   const form = useForm({
     resolver: zodResolver(projectFormSchema),
     defaultValues: {
-      name: "",
-      description: "",
-      emoji: "🚀",
+      name: project?.name || "",
+      description: project?.description || "",
+      emoji: project?.emoji || "🚀",
     },
   });
 
@@ -45,9 +50,9 @@ export default function CreateProjectForm({ setProjects, onClose }) {
 
   // Get the refetch function from useFetch
   const { data, error, loading, refetch } = useFetch(
-    "/project",
+    mode === "create" ? "/project" : `/project/${project?._id}`,
     {
-      method: "POST",
+      method: mode === "create" ? "POST" : "PUT",
       body: JSON.stringify(formValues),
       headers: {
         "Content-Type": "application/json",
@@ -60,21 +65,36 @@ export default function CreateProjectForm({ setProjects, onClose }) {
 
   useEffect(() => {
     if (error) {
-      toast.error("Failed to create project: " + error);
+      toast.error(`${error}`);
       return;
     }
     if (data) {
-      setProjects((prev) => [...prev, data.project]);
-      toast.success("Project created successfully!");
+      if (mode === "create") {
+        setProjects((prev) => [...prev, data.project]);
+        toast.success("Project created successfully!");
+      } else {
+        callback();
+        toast.success("Project updated successfully!");
+      }
+
       form.reset();
       if (onClose) onClose();
     }
-  }, [data, error, onClose, form]);
+  }, [data, error]);
+
+  useEffect(() => {
+    if (project) {
+      form.reset({
+        name: project.name || "",
+        description: project.description || "",
+        emoji: project.emoji || "🚀",
+      });
+    }
+  }, [project, form]);
 
   function onSubmit(values) {
-    setFormValues((prev) => values);
-
-    refetch();
+    setFormValues(values);
+    refetch(values);
   }
 
   const handleEmojiSelect = (emojiObject) => {
@@ -102,9 +122,13 @@ export default function CreateProjectForm({ setProjects, onClose }) {
   return (
     <div className="space-y-4">
       <div className="mb-5 pb-2 border-b">
-        <h1 className="text-xl font-semibold">Create Project</h1>
+        <h1 className="text-xl font-semibold">
+          {mode === "create" ? "Create" : "Edit"} Project
+        </h1>
         <p className="text-muted-foreground text-sm">
-          Manage your projects effectively
+          {mode === "create"
+            ? "Start a new project"
+            : "Update your project details"}
         </p>
       </div>
 
@@ -181,7 +205,13 @@ export default function CreateProjectForm({ setProjects, onClose }) {
               Cancel
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? "Creating..." : "Create Project"}
+              {loading
+                ? mode === "create"
+                  ? "Creating..."
+                  : "Updating..."
+                : mode === "create"
+                ? "Create Project"
+                : "Update Project"}
             </Button>
           </div>
         </form>

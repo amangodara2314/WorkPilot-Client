@@ -17,6 +17,7 @@ import { useGlobalContext } from "./context/GlobalContext";
 import { useEffect } from "react";
 import ShowTask from "./pages/ShowTask";
 import Project from "./pages/Project";
+import JoinWorkshop from "./pages/JoinWorkshop";
 
 function App() {
   const routes = createBrowserRouter([
@@ -69,6 +70,10 @@ function App() {
           element: <Login />,
         },
       ],
+    },
+    {
+      path: "/workshop/join/:code",
+      element: <JoinWorkshop />,
     },
   ]);
   return (

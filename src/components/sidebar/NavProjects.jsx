@@ -22,13 +22,15 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
-import CreateProjectForm from "../CreateProject";
 import { useEffect, useState } from "react";
 import useFetch from "@/hooks/use-fetch";
 import { useGlobalContext } from "@/context/GlobalContext";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 import { Skeleton } from "../ui/skeleton";
+import CreateEditTaskForm from "../CreateEditTask";
+import CreateEditProject from "../CreateEditProject";
+import DeleteProjectDialog from "../DeleteProjectDailog";
 
 export function NavProjects() {
   const { isMobile } = useSidebar();
@@ -73,8 +75,8 @@ export function NavProjects() {
           <DialogTrigger>
             <Plus className="size-3 border rounded-full border-black cursor-pointer" />
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px] max-h-[90vh]">
-            <CreateProjectForm
+          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-scroll">
+            <CreateEditProject
               setProjects={setProjects}
               onClose={() => setIsOpen(false)}
             />
@@ -82,14 +84,26 @@ export function NavProjects() {
         </Dialog>
       </SidebarGroupLabel>
       <SidebarMenu>
-        {loading && (
+        {loading ? (
           <SidebarMenu>
             {new Array(5).fill(null).map((item, index) => {
               return <Skeleton key={index} className="h-6 w-full" />;
             })}
           </SidebarMenu>
-        )}
-        {projects &&
+        ) : projects && projects.length === 0 ? (
+          <SidebarMenuItem className="mt-4">
+            <div className="flex items-center justify-center text-sm">
+              {" "}
+              <StarOff className="mr-2 size-4" />
+              <p>No projects found</p>
+            </div>
+            <p className="text-xs text-muted-foreground text-center mt-2">
+              there are no projects in this workshop. please create one to get
+              started
+            </p>
+          </SidebarMenuItem>
+        ) : (
+          projects &&
           projects.length > 0 &&
           projects.map((item) => (
             <SidebarMenuItem key={item._id}>
@@ -115,13 +129,16 @@ export function NavProjects() {
                   align={isMobile ? "end" : "start"}
                 >
                   <DropdownMenuItem className="hover:text-red-500 cursor-pointer">
-                    <Trash2 className="" />
-                    <span>Delete</span>
+                    <DeleteProjectDialog
+                      callback={refetch}
+                      projectId={item?._id}
+                    />
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </SidebarMenuItem>
-          ))}
+          ))
+        )}
       </SidebarMenu>
     </SidebarGroup>
   );

@@ -1,8 +1,16 @@
 import CountCard from "@/components/CountCard";
+import CreateEditProject from "@/components/CreateEditProject";
 import TaskTable from "@/components/TaskTable";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useGlobalContext } from "@/context/GlobalContext";
 import useFetch from "@/hooks/use-fetch";
-import { Activity, CircleCheckBig, CircleEllipsis } from "lucide-react";
+import {
+  Activity,
+  CircleCheckBig,
+  CircleEllipsis,
+  SquarePen,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
@@ -18,15 +26,16 @@ export default function Project() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalTasks, setTotalTasks] = useState(0);
   const [hasNextPage, setHasNextPage] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   const buildQueryParams = (page) => {
     return {
       page: page || currentPage,
       status: statusFilter || null,
       priority: priorityFilter || null,
-      title: searchQuery,
+      title: searchQuery || null,
       workshopId: currentWorkshop,
-      project: params.id,
+      project: params.projectId,
     };
   };
   const { data, loading, error, refetch } = useFetch(
@@ -70,9 +79,9 @@ export default function Project() {
 
   useEffect(() => {
     if (currentWorkshop) {
-      refetch();
+      fetchTasks();
     }
-  }, [currentWorkshop]);
+  }, [currentWorkshop, searchQuery, currentPage, statusFilter, priorityFilter]);
 
   useEffect(() => {
     if (error) {
@@ -83,14 +92,54 @@ export default function Project() {
   return (
     <div className="flex flex-col">
       <div className="flex-1 space-y-6 p-6">
-        <div className="">
-          <h1 className="text-2xl font-bold tracking-tight text-primary">
-            {data?.project?.emoji} {data?.project?.name}
-          </h1>
-          <span className="text-muted-foreground">
-            {data?.project?.description || null}
-          </span>
-        </div>
+        {loading && !data ? (
+          <div className="">
+            <h1 className="text-2xl font-bold tracking-tight text-primary flex gap-3 mb-2">
+              <div className="flex items-center gap-2">
+                {" "}
+                <Skeleton className="h-6 w-6" />{" "}
+                <Skeleton className="h-6 w-72" />
+              </div>
+              <button onClick={() => {}} className="text-gray-900">
+                <Skeleton className="h-6 w-6" />
+              </button>
+            </h1>
+            <span className="text-muted-foreground">
+              <Skeleton className="h-6 max-w-82" />
+              <Skeleton className="h-6 max-w-72 mt-2" />
+            </span>
+          </div>
+        ) : (
+          <div className="">
+            <h1 className="text-2xl font-bold tracking-tight text-primary flex gap-3">
+              <span>
+                {" "}
+                {data?.project?.emoji} {data?.project?.name}{" "}
+              </span>
+              <Dialog
+                modal={true}
+                onOpenChange={setIsOpen}
+                open={isOpen}
+                onClick={() => {}}
+              >
+                <DialogTrigger>
+                  <SquarePen className="size-6" />
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-scroll">
+                  <CreateEditProject
+                    project={data?.project}
+                    onClose={() => setIsOpen(false)}
+                    callback={refetch}
+                    mode="edit"
+                  />
+                </DialogContent>
+              </Dialog>
+            </h1>
+            <span className="text-muted-foreground">
+              {data?.project?.description || null}
+            </span>
+          </div>
+        )}
 
         {/* Stats Cards */}
         <div className="grid gap-4 md:grid-cols-3">
@@ -101,13 +150,13 @@ export default function Project() {
             isLoading={loading}
           />
           <CountCard
-            title="Pending Tasks"
+            title="Completed Tasks"
             icon={<CircleCheckBig className="h-4 w-4 text-muted-foreground" />}
             count={data?.completedTasks || 0}
             isLoading={loading}
           />
           <CountCard
-            title="Completed Tasks"
+            title="Pending Tasks"
             icon={<CircleEllipsis className="h-4 w-4 text-muted-foreground" />}
             count={data?.pendingTasks || 0}
             isLoading={loading}

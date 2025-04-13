@@ -34,6 +34,7 @@ export function WorkshopSwitcher({}) {
     workshops,
     currentWorkshopDetails,
     API,
+    setTasks,
   } = useGlobalContext();
   const { data, error } = getWorkshops();
   const [isOpen, setIsOpen] = React.useState(false);
@@ -69,6 +70,7 @@ export function WorkshopSwitcher({}) {
       if (response.status !== 201) {
         throw new Error(result.message || "Something went wrong");
       }
+      setTasks(null);
       setCurrentWorkshop(id);
       setCurrentWorkshopDetails(
         data.workshops.find((w) => w.workshop._id === id)

@@ -2,10 +2,16 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import GoogleAuthButton from "./GoogleAuthButton";
+import { useEffect } from "react";
 
 export function LoginForm({ className, ...props }) {
+  const [searchParams] = useSearchParams();
+  const redirect = searchParams.get("redirect") || "";
+  useEffect(() => {
+    console.log(redirect, searchParams.get("redirect"));
+  }, [redirect]);
   return (
     <form className={cn("flex flex-col gap-6", className)} {...props}>
       <div className="flex flex-col items-center gap-2 text-center">
@@ -44,11 +50,14 @@ export function LoginForm({ className, ...props }) {
             Or continue with
           </span>
         </div>
-        <GoogleAuthButton type={"login"} />
+        <GoogleAuthButton redirect={redirect} type={"login"} />
       </div>
       <div className="text-center text-sm">
         Don&apos;t have an account?{" "}
-        <Link to="/auth/signup" className="underline underline-offset-4">
+        <Link
+          to={`/auth/signup${redirect == "" ? "" : `?redirect=${redirect}`}`}
+          className="underline underline-offset-4"
+        >
           Sign up
         </Link>
       </div>

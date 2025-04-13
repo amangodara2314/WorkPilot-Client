@@ -43,7 +43,7 @@ export default function DeleteWorkshopButton() {
       navigate("/workshop/" + data.userWorkshop._id, { replace: true });
     }
     if (error) {
-      toast.error(error.message || "Something went wrong");
+      toast.error(error || "Something went wrong");
     }
   }, [data, error]);
   return (

@@ -89,22 +89,11 @@ export default function TaskTable({
 
   const toggleAllTasks = () => {
     setSelectedTasks(
-      selectedTasks.length === tasks?.length
+      selectedTasks?.length === tasks?.length
         ? []
         : tasks?.map((task) => task._id)
     );
   };
-
-  if (loading && !tasks) {
-    return (
-      <TaskTableSkeleton
-        columns={columns}
-        selectedTasks={selectedTasks}
-        tasks={tasks}
-        toggleAllTasks={toggleAllTasks}
-      />
-    );
-  }
 
   return (
     <div className="w-full max-w-7xl mx-auto">
@@ -149,6 +138,7 @@ export default function TaskTable({
                 selectedTasks={selectedTasks}
                 tasks={tasks}
               />
+
               <TaskTableBody
                 loading={loading}
                 tasks={tasks}

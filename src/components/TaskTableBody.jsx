@@ -10,13 +10,13 @@ import {
 import WorkshopLinkTag from "@/components/WorkshopLinkTag";
 import DeleteTask from "@/components/DeleteTask";
 import { getStatusColor } from "@/lib/helper";
-import TaskTableSkeleton from "@/components/TaskTableSkeleton";
 import {
   ChevronDown,
   ChevronRight,
   ChevronUp,
   MoreHorizontal,
 } from "lucide-react";
+import TaskTableSkeleton from "./TaskTableSkeleton";
 
 export function TaskTableBody({
   loading,
@@ -29,6 +29,7 @@ export function TaskTableBody({
   currentPage,
   buildQueryParams,
   rowsPerPage,
+  toggleAllTasks,
 }) {
   const getPriorityIcon = (priority) => {
     switch (priority?.toLowerCase()) {
@@ -45,8 +46,13 @@ export function TaskTableBody({
 
   return (
     <tbody className="[&_tr:last-child]:border-0">
-      {loading ? (
-        <TaskTableSkeleton rowsPerPage={rowsPerPage} columns={columns} />
+      {loading || !tasks ? (
+        <TaskTableSkeleton
+          columns={columns}
+          selectedTasks={selectedTasks}
+          tasks={tasks}
+          toggleAllTasks={toggleAllTasks}
+        />
       ) : tasks?.length === 0 ? (
         <tr>
           <td

@@ -4,7 +4,7 @@ import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 
-export default function GoogleAuthButton({ type }) {
+export default function GoogleAuthButton({ type, redirect = "" }) {
   const { API } = useGlobalContext();
   const navigate = useNavigate();
   const registerWithGoogle = async (response) => {
@@ -22,9 +22,13 @@ export default function GoogleAuthButton({ type }) {
           toast.error(data.message);
           return;
         } else {
-          toast.success("Welcome " + data.user.name);
+          toast.success("Welcome to WorkPilot!");
           sessionStorage.setItem("accessToken", JSON.stringify(data.token));
-          navigate("/workshop/" + data.workshop._id);
+          navigate(
+            redirect == ""
+              ? "/workshop/" + data.user.currentWorkshop
+              : "/" + redirect
+          );
         }
       } else {
         toast.error("Something went wrong");
@@ -50,7 +54,12 @@ export default function GoogleAuthButton({ type }) {
         } else {
           toast.success(data.message);
           sessionStorage.setItem("accessToken", JSON.stringify(data.token));
-          navigate("/workshop/" + data.user.currentWorkshop);
+
+          navigate(
+            redirect == ""
+              ? "/workshop/" + data.user.currentWorkshop
+              : "/" + redirect
+          );
         }
       } else {
         toast.error("Something went wrong");
