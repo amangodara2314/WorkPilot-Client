@@ -94,6 +94,16 @@ export function WorkshopSwitcher({}) {
     }
   };
 
+  if (error) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem className="text-sm text-muted-foreground text-center py-2">
+          Error Occured
+        </SidebarMenuItem>
+      </SidebarMenu>
+    );
+  }
+
   if (!data || !workshops || !currentWorkshopDetails) {
     return (
       <SidebarMenu>

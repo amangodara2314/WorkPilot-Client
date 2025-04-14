@@ -2,10 +2,16 @@ import { useGlobalContext } from "@/context/GlobalContext";
 import React, { useEffect, useState } from "react";
 import { Navigate, Outlet, useNavigate } from "react-router-dom";
 import { SpinningText } from "@/components/magicui/spinning-text";
+import socket from "@/lib/socket";
 
 const RouteHandler = () => {
-  const { setCurrentWorkshopDetails, API, setCurrentWorkshop, setUser } =
-    useGlobalContext();
+  const {
+    setCurrentWorkshopDetails,
+    API,
+    setCurrentWorkshop,
+    setUser,
+    setPermissions,
+  } = useGlobalContext();
   const accessToken = sessionStorage.getItem("accessToken");
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -25,6 +31,11 @@ const RouteHandler = () => {
           setCurrentWorkshop(result.user.currentWorkshop._id);
           setCurrentWorkshopDetails(result.user.currentWorkshop);
           setUser(result.user);
+          setPermissions(result.permissions);
+          socket.emit("join_room", {
+            userId: result.user._id,
+            workshopId: result.user.currentWorkshop._id,
+          });
 
           if (result.user.currentWorkshop) {
             if (window.location.pathname === "/") {

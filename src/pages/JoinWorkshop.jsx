@@ -39,7 +39,7 @@ export default function JoinWorkshop() {
           setStatus("loading");
 
           const res = await fetch(`${API}/workshop/join/${code}`, {
-            method: "PUT",
+            method: "POST",
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${JSON.parse(
@@ -50,7 +50,7 @@ export default function JoinWorkshop() {
 
           const data = await res.json();
 
-          if (res.status === 200) {
+          if (res.status === 201) {
             setStatus("success");
             setMessage("You have successfully joined the workshop!");
             setCurrentWorkshop(data.workshop._id);

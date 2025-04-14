@@ -3,6 +3,7 @@ import TaskTable from "@/components/TaskTable";
 import { useGlobalContext } from "@/context/GlobalContext";
 import useFetch from "@/hooks/use-fetch";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 export default function Tasks() {
   const {
@@ -23,6 +24,7 @@ export default function Tasks() {
     setTotalTasks,
     hasNextPage,
     setHasNextPage,
+    permissions,
   } = useGlobalContext();
 
   const buildQueryParams = (page) => {
@@ -87,7 +89,7 @@ export default function Tasks() {
             Here&apos;s the list of tasks for this workspace!
           </p>
         </div>
-        <TaskDialog />
+        {permissions && permissions?.task.includes("create") && <TaskDialog />}
       </div>
       <TaskTable
         tasks={tasks}

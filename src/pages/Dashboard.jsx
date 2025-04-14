@@ -146,7 +146,7 @@ const workshopData = {
 };
 
 export default function DashboardPage() {
-  const { API } = useGlobalContext();
+  const { user } = useGlobalContext();
   const params = useParams();
 
   const { data, error, loading, refetch } = useFetch(
@@ -186,7 +186,7 @@ export default function DashboardPage() {
             isLoading={loading}
           />
           <CountCard
-            title="Total Tasks"
+            title={user.role == "Member" ? "Your Tasks" : "Total Tasks"}
             icon={<CheckCircle2 className="h-4 w-4 text-muted-foreground" />}
             count={data?.totalTasks || 0}
             isLoading={loading}
@@ -199,12 +199,12 @@ export default function DashboardPage() {
           {loading ? (
             <RecentCardSkeleton />
           ) : (
-            <RecentTasks workshopData={workshopData} />
+            <RecentTasks tasks={data?.recentTasks} />
           )}
           {loading ? (
             <RecentCardSkeleton />
           ) : (
-            <RecentMembers workshopData={workshopData} />
+            <RecentMembers members={data?.recentMembers} />
           )}
           {/* Recent Members */}
         </div>

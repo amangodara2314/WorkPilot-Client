@@ -35,7 +35,8 @@ import DeleteProjectDialog from "../DeleteProjectDailog";
 export function NavProjects() {
   const { isMobile } = useSidebar();
   const [isOpen, setIsOpen] = useState(false);
-  const { currentWorkshop, setProjects, projects } = useGlobalContext();
+  const { currentWorkshop, setProjects, projects, permissions } =
+    useGlobalContext();
   const { data, error, loading, refetch } = useFetch(
     "/project/" + currentWorkshop,
     {
@@ -64,24 +65,26 @@ export function NavProjects() {
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-      <SidebarGroupLabel className="text-primary flex items-center justify-between">
+      <SidebarGroupLabel className="text-primary text-xs flex items-center justify-between">
         Projects
-        <Dialog
-          modal={true}
-          onOpenChange={setIsOpen}
-          open={isOpen}
-          onClick={() => {}}
-        >
-          <DialogTrigger>
-            <Plus className="size-3 border rounded-full border-black cursor-pointer" />
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-scroll">
-            <CreateEditProject
-              setProjects={setProjects}
-              onClose={() => setIsOpen(false)}
-            />
-          </DialogContent>
-        </Dialog>
+        {permissions && permissions?.project?.includes("create") && (
+          <Dialog
+            modal={true}
+            onOpenChange={setIsOpen}
+            open={isOpen}
+            onClick={() => {}}
+          >
+            <DialogTrigger>
+              <Plus className="size-3 border rounded-full border-black cursor-pointer" />
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-scroll">
+              <CreateEditProject
+                setProjects={setProjects}
+                onClose={() => setIsOpen(false)}
+              />
+            </DialogContent>
+          </Dialog>
+        )}
       </SidebarGroupLabel>
       <SidebarMenu>
         {loading ? (

@@ -40,28 +40,33 @@ export default function RecentMembers({ members = [] }) {
           {members.length > 0 &&
             members.map((member) => (
               <div
-                key={member.id}
+                key={member._id}
                 className="flex items-center justify-between space-x-4"
               >
                 <div className="flex flex-1 items-center space-x-4">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={member.avatar} alt={member.name} />
-                    <AvatarFallback>{member.initials}</AvatarFallback>
+                    <AvatarImage
+                      src={member?.user?.profileImage}
+                      alt={member?.user?.name}
+                    />
+                    <AvatarFallback>{member?.user?.name}</AvatarFallback>
                   </Avatar>
                   <div className="flex-1 space-y-1">
                     <p className="text-sm font-medium leading-none">
-                      {member.name}
+                      {member?.user?.name}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {member.role}
+                      {member?.role?.name}
                     </p>
                   </div>
                 </div>
                 <div className="text-right text-xs">
-                  <p className="font-medium">Joined {member.joinedDate}</p>
-                  <p className="text-muted-foreground">
-                    {member.tasksCompleted} tasks completed
+                  <p className="font-medium">
+                    Joined at {new Date(member.joinedAt).toDateString()}
                   </p>
+                  {/* <p className="text-muted-foreground">
+                    {member.tasksCompleted} tasks completed
+                  </p> */}
                 </div>
               </div>
             ))}

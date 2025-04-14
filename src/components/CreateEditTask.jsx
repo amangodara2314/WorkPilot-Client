@@ -95,8 +95,15 @@ export default function CreateEditTaskForm({
 
   const url = isEditing && task ? "/task/" + task._id : "/task";
   const method = isEditing && task ? "PUT" : "POST";
-  const { projects, members, setMembers, currentWorkshop, setTasks } =
-    useGlobalContext();
+  const {
+    projects,
+    members,
+    setMembers,
+    currentWorkshop,
+    setTasks,
+    permissions,
+    user,
+  } = useGlobalContext();
 
   const {
     data: res,
@@ -251,6 +258,7 @@ export default function CreateEditTaskForm({
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
+                  disabled={user?.role == "Member"}
                 >
                   <FormControl>
                     <SelectTrigger>
@@ -340,6 +348,7 @@ export default function CreateEditTaskForm({
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
+                  disabled={user?.role == "Member"}
                 >
                   <FormControl>
                     <SelectTrigger>

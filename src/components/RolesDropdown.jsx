@@ -23,7 +23,7 @@ export default function RolesDropdown({
   changingRole = false,
   setChangingRole = () => {},
 }) {
-  const { API, currentWorkshop } = useGlobalContext();
+  const { API, currentWorkshop, user } = useGlobalContext();
   const navigate = useNavigate();
   const changeRole = async (role) => {
     setChangingRole(true);
@@ -62,8 +62,10 @@ export default function RolesDropdown({
   };
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline">{member?.role?.name || "Select Role"}</Button>
+      <DropdownMenuTrigger disabled={user?.role == "Member"} asChild>
+        <Button className="w-[90px]" variant="outline">
+          {member?.role?.name || "Select Role"}
+        </Button>
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-80">

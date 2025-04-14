@@ -12,6 +12,7 @@ import {
 import { useLocation } from "react-router-dom";
 import WorkshopLinkTag from "../WorkshopLinkTag";
 import { useGlobalContext } from "@/context/GlobalContext";
+import { useEffect } from "react";
 
 const items = [
   { title: "Dashboard", icon: <LayoutDashboard /> },
@@ -21,16 +22,25 @@ const items = [
 ];
 
 export function NavMain() {
-  const { currentWorkshop } = useGlobalContext();
+  const { currentWorkshop, permissions } = useGlobalContext();
   const location = useLocation();
 
   const normalizedPath = location.pathname.endsWith("/")
     ? location.pathname.slice(0, -1)
     : location.pathname;
 
+  useEffect(() => {
+    console.log(permissions);
+  }, [permissions]);
   return (
     <SidebarMenu className="px-2">
       {items.map((item) => {
+        if (
+          item.title == "Settings" &&
+          !permissions?.workshop.includes("edit")
+        ) {
+          return null;
+        }
         const isActive =
           item.title === "Dashboard"
             ? normalizedPath === "/workshop/" + currentWorkshop

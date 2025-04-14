@@ -1,9 +1,7 @@
 import { Toaster } from "@/components/ui/sonner";
-import getWorkshops from "@/hooks/get-workshops";
-import useFetch from "@/hooks/use-fetch";
+import socket from "@/lib/socket";
+
 import { createContext, useContext, useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { toast } from "sonner";
 
 const MainContext = createContext();
 
@@ -24,6 +22,7 @@ export default function GlobalContext({ children }) {
   const [totalTasks, setTotalTasks] = useState(0);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [currentWorkshopDetails, setCurrentWorkshopDetails] = useState(null);
+  const [permissions, setPermissions] = useState(null);
 
   return (
     <MainContext.Provider
@@ -58,6 +57,9 @@ export default function GlobalContext({ children }) {
         currentWorkshopDetails,
         setCurrentWorkshopDetails,
         setHasNextPage,
+        permissions,
+        setPermissions,
+        socket,
       }}
     >
       {children}

@@ -89,23 +89,32 @@ export default function Members() {
         ) : (
           <>
             <div className="flex items-center space-x-2 max-w-full">
-              <Input
-                value={data?.joinUrl || ""}
-                readOnly
-                className="cursor-default"
-              />
-              <Button
-                onClick={handleCopy}
-                variant="outline"
-                disabled={copied}
-                className="bg-[#18181B] text-white hover:text-white hover:bg-[#18181B]/90"
-              >
-                {!copied ? <CopyIcon /> : <Check />}
-              </Button>
+              {!data.joinUrl ? (
+                <div className="text-center text-muted-foreground text-sm w-full">
+                  You don't have permission to view this.
+                </div>
+              ) : (
+                <>
+                  {" "}
+                  <Input
+                    value={data?.joinUrl || ""}
+                    readOnly
+                    className="cursor-default"
+                  />
+                  <Button
+                    onClick={handleCopy}
+                    variant="outline"
+                    disabled={copied}
+                    className="bg-[#18181B] text-white hover:text-white hover:bg-[#18181B]/90"
+                  >
+                    {!copied ? <CopyIcon /> : <Check />}
+                  </Button>
+                </>
+              )}
             </div>
             <Separator className="" />
-            {!loading && (
-              <div className="space-y-2">
+            {!loading && !error && (
+              <div className="space-y-3">
                 {data?.members?.map((member) => (
                   <div
                     key={member._id}
