@@ -75,6 +75,10 @@ function App() {
       path: "/workshop/join/:code",
       element: <JoinWorkshop />,
     },
+    {
+      path: "*",
+      elementL: <div>404</div>,
+    },
   ]);
   return (
     <>
