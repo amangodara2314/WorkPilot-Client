@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGlobalContext } from "@/context/GlobalContext";
 import useFetch from "@/hooks/use-fetch";
+import socket from "@/lib/socket";
 import {
   Activity,
   CircleCheckBig,
@@ -88,6 +89,19 @@ export default function Project() {
       toast.error(error || "Something Went Wrong");
     }
   }, [error]);
+
+  useEffect(() => {
+    socket.on("new_task", (data) => {
+      if (params.projectId == data.task.project) {
+        fetchTasks();
+        refetch();
+      }
+      toast.info(data.message, {
+        duration: 8000,
+        description: data?.description,
+      });
+    });
+  }, [socket]);
 
   return (
     <div className="flex flex-col">

@@ -2,6 +2,7 @@ import TaskDialog from "@/components/TaskDailog";
 import TaskTable from "@/components/TaskTable";
 import { useGlobalContext } from "@/context/GlobalContext";
 import useFetch from "@/hooks/use-fetch";
+import socket from "@/lib/socket";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -80,6 +81,16 @@ export default function Tasks() {
       refetch();
     }
   }, [currentWorkshop]);
+
+  useEffect(() => {
+    socket.on("new_task", (data) => {
+      refetch();
+      toast.info(data.message, {
+        duration: 8000,
+        description: data?.description,
+      });
+    });
+  }, [socket]);
   return (
     <div className="w-full h-full flex-col space-y-8 p-6">
       <div className="flex items-center justify-between space-y-2">

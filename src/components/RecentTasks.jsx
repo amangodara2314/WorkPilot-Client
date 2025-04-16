@@ -25,7 +25,7 @@ export default function RecentTasks({ tasks = [] }) {
       <CardHeader className="flex flex-row items-center">
         <div className="flex-1">
           <CardTitle>
-            {user.role == "Member" ? "Your Recent Tasks" : "Recent Tasks"}
+            {user?.role == "Member" ? "Your Recent Tasks" : "Recent Tasks"}
           </CardTitle>
           <CardDescription>Latest tasks in your workshop</CardDescription>
         </div>
@@ -48,17 +48,20 @@ export default function RecentTasks({ tasks = [] }) {
                 key={task._id}
                 className="flex items-center justify-between space-x-4"
               >
-                <div className="flex flex-1 items-center space-x-4">
+                <div className="flex flex-1 w-3/4 items-center space-x-4 truncate">
                   <Avatar className="h-8 w-8">
                     <AvatarImage
                       src={task?.assignedTo?.profileImage}
                       alt={task?.assignedTo?.name}
                     />
-                    <AvatarFallback>{task?.assignedTo?.name}</AvatarFallback>
+                    <AvatarFallback>
+                      {task?.assignedTo?.name[0].toUpperCase()}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 space-y-1">
                     <p className="text-sm font-medium leading-none">
-                      {task.title}
+                      {task.title} akldflajsd ldjfl asldjfl sdljflasjdlfjasd
+                      ljsdjfs afkdlfjdsl jsdlk
                     </p>
                     <div className="flex items-center text-xs text-muted-foreground">
                       <Clock className="mr-1 h-3 w-3" />
@@ -74,7 +77,7 @@ export default function RecentTasks({ tasks = [] }) {
                       ? "default"
                       : "secondary"
                   }
-                  className="ml-auto w-20 flex items-center justify-center"
+                  className="ml-auto flex items-center justify-center"
                 >
                   {task.status}
                 </Badge>

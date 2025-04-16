@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
-
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -34,6 +33,9 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 import { useGlobalContext } from "@/context/GlobalContext";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import socket from "@/lib/socket";
+import { cn } from "@/lib/utils";
+import { DatePicker } from "./DatePicker";
 
 const taskFormSchema = z.object({
   title: z.string().min(2, {
@@ -85,11 +87,11 @@ export default function CreateEditTaskForm({
           : task.project?._id
         : "",
       assignedTo: task ? (task.assignedTo ? task.assignedTo._id : "") : "",
-      dueDate: task
-        ? task.dueDate
-          ? new Date(task.dueDate)
+      dueDate: task?.dueDate
+        ? new Date(task?.dueDate)
+          ? new Date(task?.dueDate)
           : undefined
-        : null,
+        : undefined,
     },
   });
 
@@ -147,6 +149,20 @@ export default function CreateEditTaskForm({
         setTasks((prev = []) =>
           prev?.map((t) => (t._id === task._id ? res.task : t))
         );
+      } else {
+        console.log(
+          res,
+          res.task.assignedTo.name,
+          res.task.assignedTo.name || "a member"
+        );
+        socket.emit("new_task", {
+          message: `${user.name} has created a new task`,
+          workshopId: currentWorkshop,
+          description: `this task has been assigned to ${
+            res.task.assignedTo.name || "a member"
+          }`,
+          task: res.task,
+        });
       }
       callback(res);
       toast.success(`Task ${isEditing ? "updated" : "created"} successfully!`);
@@ -202,7 +218,6 @@ export default function CreateEditTaskForm({
               </FormItem>
             )}
           />
-
           {/* Description Field */}
           <FormField
             control={form.control}
@@ -221,7 +236,6 @@ export default function CreateEditTaskForm({
               </FormItem>
             )}
           />
-
           <FormField
             control={form.control}
             name="badge"
@@ -248,7 +262,6 @@ export default function CreateEditTaskForm({
               </FormItem>
             )}
           />
-
           <FormField
             control={form.control}
             name="project"
@@ -281,7 +294,6 @@ export default function CreateEditTaskForm({
               </FormItem>
             )}
           />
-
           {/* Status Field */}
           <FormField
             control={form.control}
@@ -310,7 +322,6 @@ export default function CreateEditTaskForm({
               </FormItem>
             )}
           />
-
           {/* Priority Field */}
           <FormField
             control={form.control}
@@ -337,7 +348,6 @@ export default function CreateEditTaskForm({
               </FormItem>
             )}
           />
-
           {/* Assigned To Field */}
           <FormField
             control={form.control}
@@ -389,48 +399,13 @@ export default function CreateEditTaskForm({
             )}
           />
 
-          {/* Due Date Field */}
-          <FormField
-            control={form.control}
+          <DatePicker
+            form={form}
             name="dueDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Due Date</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant="outline"
-                        className="w-full pl-3 text-left font-normal"
-                      >
-                        {field.value ? (
-                          format(field.value, "PPP")
-                        ) : (
-                          <span className="text-muted-foreground">
-                            Pick a date
-                          </span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormDescription>
-                  Optional: Set a deadline for this task
-                </FormDescription>
-                <FormMessage />
-              </FormItem>
-            )}
+            label="Due Date"
+            description="Optional: Set a deadline for this task"
+            disabled={loading}
           />
-
           <div className="flex justify-end space-x-2 pt-4">
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel

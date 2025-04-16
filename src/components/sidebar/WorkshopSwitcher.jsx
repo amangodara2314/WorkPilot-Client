@@ -24,6 +24,7 @@ import CreateWorkshopForm from "../CreateWorkshop";
 import { Dialog, DialogContent } from "../ui/dialog";
 import { useNavigate } from "react-router-dom";
 import { set } from "date-fns";
+import socket from "@/lib/socket";
 export function WorkshopSwitcher({}) {
   const { isMobile } = useSidebar();
   const {
@@ -70,6 +71,11 @@ export function WorkshopSwitcher({}) {
       if (response.status !== 201) {
         throw new Error(result.message || "Something went wrong");
       }
+      socket.emit("workshop_changed", {
+        user: result.user,
+        workshopId: id,
+        prevWorkshopId: currentWorkshop,
+      });
       setTasks(null);
       setCurrentWorkshop(id);
       setCurrentWorkshopDetails(

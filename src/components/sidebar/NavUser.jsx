@@ -27,12 +27,14 @@ import {
 } from "@/components/ui/sidebar";
 import { useGlobalContext } from "@/context/GlobalContext";
 import { useNavigate } from "react-router-dom";
+import socket from "@/lib/socket";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
   const { user } = useGlobalContext();
   const navigate = useNavigate();
   const handleLogout = () => {
+    socket.emit("manual_disconnect");
     sessionStorage.removeItem("accessToken");
     navigate("/auth/login");
   };

@@ -27,6 +27,7 @@ import RecentTasks from "@/components/RecentTasks";
 import RecentCardSkeleton from "@/components/RecentCardSkeleton";
 import RecentMembers from "@/components/RecentMembers";
 import { toast } from "sonner";
+import socket from "@/lib/socket";
 
 const workshopData = {
   stats: {
@@ -159,6 +160,15 @@ export default function DashboardPage() {
   if (error) {
     toast.error(error);
   }
+  useEffect(() => {
+    socket.on("new_task", (data) => {
+      refetch();
+      toast.info(data.message, {
+        duration: 8000,
+        description: data?.description,
+      });
+    });
+  }, [socket]);
   return (
     <div className="flex flex-col">
       <div className="flex-1 space-y-6 p-6">
@@ -186,7 +196,7 @@ export default function DashboardPage() {
             isLoading={loading}
           />
           <CountCard
-            title={user.role == "Member" ? "Your Tasks" : "Total Tasks"}
+            title={user?.role == "Member" ? "Your Tasks" : "Total Tasks"}
             icon={<CheckCircle2 className="h-4 w-4 text-muted-foreground" />}
             count={data?.totalTasks || 0}
             isLoading={loading}

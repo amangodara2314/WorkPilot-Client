@@ -31,6 +31,7 @@ import { Skeleton } from "../ui/skeleton";
 import CreateEditTaskForm from "../CreateEditTask";
 import CreateEditProject from "../CreateEditProject";
 import DeleteProjectDialog from "../DeleteProjectDailog";
+import socket from "@/lib/socket";
 
 export function NavProjects() {
   const { isMobile } = useSidebar();
@@ -62,6 +63,19 @@ export function NavProjects() {
       toast.error(error);
     }
   }, [data, error]);
+
+  useEffect(() => {
+    socket.on("new_project", (data) => {
+      console.log(data);
+      refetch();
+      toast.info(`New Project: ${data.name}`, {
+        duration: 8000,
+        description: `a new project has been created by ${
+          data.createdBy.name || "Anonymous"
+        }`,
+      });
+    });
+  }, [socket]);
 
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">

@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/sonner";
 import socket from "@/lib/socket";
 
 import { createContext, useContext, useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const MainContext = createContext();
 
@@ -23,6 +24,27 @@ export default function GlobalContext({ children }) {
   const [hasNextPage, setHasNextPage] = useState(false);
   const [currentWorkshopDetails, setCurrentWorkshopDetails] = useState(null);
   const [permissions, setPermissions] = useState(null);
+  const [activeUsers, setActiveUsers] = useState([]);
+
+  useEffect(() => {
+    if (sessionStorage.getItem("accessToken")) {
+      socket.on("active_users", (users) => {
+        console.log(users);
+
+        setActiveUsers(users);
+      });
+      socket.on("new_message", (data) => {
+        toast.info(data.message, {
+          duration: 8000,
+          description: data?.description,
+        });
+      });
+    }
+    socket.on("user_disconnected", ({ userId }) => {
+      console.log(userId);
+      setActiveUsers((prevUsers) => prevUsers.filter((a) => a._id !== userId));
+    });
+  }, [socket]);
 
   return (
     <MainContext.Provider
@@ -60,6 +82,8 @@ export default function GlobalContext({ children }) {
         permissions,
         setPermissions,
         socket,
+        activeUsers,
+        setActiveUsers,
       }}
     >
       {children}

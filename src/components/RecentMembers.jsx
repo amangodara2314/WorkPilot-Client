@@ -49,7 +49,9 @@ export default function RecentMembers({ members = [] }) {
                       src={member?.user?.profileImage}
                       alt={member?.user?.name}
                     />
-                    <AvatarFallback>{member?.user?.name}</AvatarFallback>
+                    <AvatarFallback>
+                      {member?.user?.name[0].toUpperCase()}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 space-y-1">
                     <p className="text-sm font-medium leading-none">

@@ -32,8 +32,9 @@ const RouteHandler = () => {
           setCurrentWorkshopDetails(result.user.currentWorkshop);
           setUser(result.user);
           setPermissions(result.permissions);
+          console.log("emitting join_room");
           socket.emit("join_room", {
-            userId: result.user._id,
+            user: result.user,
             workshopId: result.user.currentWorkshop._id,
           });
 

@@ -16,6 +16,7 @@ import useFetch from "@/hooks/use-fetch";
 import { useState, useRef, useEffect } from "react";
 import EmojiPicker from "emoji-picker-react";
 import { toast } from "sonner";
+import socket from "@/lib/socket";
 
 const projectFormSchema = z.object({
   name: z.string().min(2, {
@@ -70,6 +71,7 @@ export default function CreateEditProject({
     }
     if (data) {
       if (mode === "create") {
+        socket.emit("new_project", data.project);
         setProjects((prev) => [...prev, data.project]);
         toast.success("Project created successfully!");
       } else {
