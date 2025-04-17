@@ -24,7 +24,7 @@ export function ActiveUsers() {
         <div className="flex items-center gap-2 px-3 py-1.5 cursor-pointer transition-colors sm:gap-2">
           <div className="flex -space-x-3">
             {visibleUsers.map((user, index) => (
-              <div key={user.id} className="relative">
+              <div key={user._id} className="relative">
                 <Avatar
                   className="h-7 w-7 border-2 border-white ring-2 ring-gray-100"
                   style={{ zIndex: visibleUsers.length - index }}
@@ -66,7 +66,7 @@ export function ActiveUsers() {
         <ScrollArea className="h-[calc(100vh-5rem)] pt-4">
           {activeUsers.map((user) => (
             <div
-              key={user.id}
+              key={user._id}
               className="flex items-center justify-between gap-3 px-2 py-2 hover:bg-gray-100 rounded-lg transition-colors group"
             >
               <div className="flex items-center gap-3 w-[70%]">

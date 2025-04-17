@@ -62,7 +62,7 @@ export default function Settings() {
 
   return (
     <div className="flex justify-center">
-      <div className="flex-1 py-6 max-w-[75%]">
+      <div className="flex-1 py-6 px-6 md:px-20 lg:px-40 space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-semibold">Workshop Settings</h1>
@@ -107,12 +107,12 @@ export default function Settings() {
             </p>
           </div>
 
-          <div className="flex items-center justify-end  gap-4">
+          <div className="flex md:flex-row flex-wrap items-center justify-end gap-4">
             <DeleteWorkshopButton />
             <Button
               onClick={handleSave}
               disabled={loading}
-              className="bg-[#18181B] text-white hover:bg-[#18181B]/90"
+              className="bg-[#18181B] text-white hover:bg-[#18181B]/90 sm:w-fit w-full"
             >
               {loading ? "Saving Changes..." : "Save Changes"}
             </Button>

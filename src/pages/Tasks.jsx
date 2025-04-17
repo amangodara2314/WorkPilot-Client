@@ -1,4 +1,4 @@
-import TaskDialog from "@/components/TaskDailog";
+import TaskDialog from "@/components/TaskDialog";
 import TaskTable from "@/components/TaskTable";
 import { useGlobalContext } from "@/context/GlobalContext";
 import useFetch from "@/hooks/use-fetch";

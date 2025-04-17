@@ -6,7 +6,6 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -17,16 +16,16 @@ import {
 } from "@/components/ui/sidebar";
 import { useGlobalContext } from "@/context/GlobalContext";
 import { Skeleton } from "../ui/skeleton";
-import getWorkshops from "@/hooks/get-workshops";
+import useWorkshops from "@/hooks/use-workshops";
 import { toast } from "sonner";
-import { DialogTrigger } from "@radix-ui/react-dialog";
 import CreateWorkshopForm from "../CreateWorkshop";
 import { Dialog, DialogContent } from "../ui/dialog";
 import { useNavigate } from "react-router-dom";
-import { set } from "date-fns";
 import socket from "@/lib/socket";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+
 export function WorkshopSwitcher({}) {
-  const { isMobile } = useSidebar();
+  const { isMobile, open } = useSidebar();
   const {
     currentWorkshop,
     setCurrentWorkshop,
@@ -37,18 +36,17 @@ export function WorkshopSwitcher({}) {
     API,
     setTasks,
   } = useGlobalContext();
-  const { data, error } = getWorkshops();
+  const { data, error } = useWorkshops();
   const [isOpen, setIsOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    console.log(data, error);
     if (data) {
       setWorkshops(data.workshops);
-      // setCurrentWorkshopDetails(
-      //   data.workshops.find((w) => w.workshop._id === currentWorkshop)
-      // );
+      setCurrentWorkshopDetails(
+        data.workshops.find((w) => w.workshop._id === currentWorkshop)
+      );
     }
     if (error) {
       toast.error(
@@ -56,6 +54,10 @@ export function WorkshopSwitcher({}) {
       );
     }
   }, [data, error]);
+
+  React.useEffect(() => {
+    console.log(open);
+  }, [open]);
 
   const changeWorkshop = async (id) => {
     setIsLoading(true);
@@ -104,7 +106,7 @@ export function WorkshopSwitcher({}) {
     return (
       <SidebarMenu>
         <SidebarMenuItem className="text-sm text-muted-foreground text-center py-2">
-          Error Occured
+          Error Occurred
         </SidebarMenuItem>
       </SidebarMenu>
     );
@@ -119,6 +121,7 @@ export function WorkshopSwitcher({}) {
       </SidebarMenu>
     );
   }
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -128,18 +131,37 @@ export function WorkshopSwitcher({}) {
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground w-full"
             >
+              {/* For icon/logo - could be shown in both open and expanded states */}
               {/* <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                 <activeWorkshop.logo className="size-4" />
               </div> */}
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate text-primary font-semibold">
-                  {currentWorkshopDetails?.name
-                    ? currentWorkshopDetails?.name
-                    : currentWorkshopDetails?.workshop?.name}
-                </span>
-                <span className="truncate text-xs">Free</span>
-              </div>
-              <ChevronsUpDown className="ml-auto" />
+
+              {open ? (
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate text-primary font-semibold">
+                    {currentWorkshopDetails?.name
+                      ? currentWorkshopDetails?.name
+                      : currentWorkshopDetails?.workshop?.name}
+                  </span>
+                  <span className="truncate text-xs">Free</span>
+                </div>
+              ) : null}
+
+              {open ? (
+                <ChevronsUpDown className="ml-auto size-4" />
+              ) : (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex w-full justify-center items-center">
+                      <ChevronsUpDown className="size-4" />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {currentWorkshopDetails?.name ||
+                      currentWorkshopDetails?.workshop?.name}
+                  </TooltipContent>
+                </Tooltip>
+              )}
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -156,7 +178,7 @@ export function WorkshopSwitcher({}) {
                 if (workshop?.workshop?._id === currentWorkshop) return null;
                 return (
                   <DropdownMenuItem
-                    key={workshop?.workshop?.name}
+                    key={workshop?.workshop?.name || index}
                     onClick={() => {
                       changeWorkshop(workshop?.workshop?._id);
                     }}

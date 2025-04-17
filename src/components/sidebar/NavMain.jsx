@@ -29,9 +29,6 @@ export function NavMain() {
     ? location.pathname.slice(0, -1)
     : location.pathname;
 
-  useEffect(() => {
-    console.log(permissions);
-  }, [permissions]);
   return (
     <SidebarMenu className="px-2">
       {items.map((item) => {

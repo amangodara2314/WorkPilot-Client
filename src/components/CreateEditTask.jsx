@@ -1,8 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
+
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -22,20 +20,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
+
 import useFetch from "@/hooks/use-fetch";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { useGlobalContext } from "@/context/GlobalContext";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import socket from "@/lib/socket";
-import { cn } from "@/lib/utils";
 import { DatePicker } from "./DatePicker";
+import { z } from "zod";
 
 const taskFormSchema = z.object({
   title: z.string().min(2, {
@@ -71,8 +64,8 @@ export default function CreateEditTaskForm({
   task = null,
   isEditing = false,
   callback = () => {},
+  setTasks = () => {},
 }) {
-  console.log(task);
   const form = useForm({
     resolver: zodResolver(taskFormSchema),
     defaultValues: {
@@ -87,25 +80,14 @@ export default function CreateEditTaskForm({
           : task.project?._id
         : "",
       assignedTo: task ? (task.assignedTo ? task.assignedTo._id : "") : "",
-      dueDate: task?.dueDate
-        ? new Date(task?.dueDate)
-          ? new Date(task?.dueDate)
-          : undefined
-        : undefined,
+      dueDate: task?.dueDate ? new Date(task.dueDate) : undefined,
     },
   });
 
   const url = isEditing && task ? "/task/" + task._id : "/task";
   const method = isEditing && task ? "PUT" : "POST";
-  const {
-    projects,
-    members,
-    setMembers,
-    currentWorkshop,
-    setTasks,
-    permissions,
-    user,
-  } = useGlobalContext();
+  const { projects, members, setMembers, currentWorkshop, permissions, user } =
+    useGlobalContext();
 
   const {
     data: res,
@@ -144,17 +126,14 @@ export default function CreateEditTaskForm({
   );
 
   useEffect(() => {
+    if (!res && !error) return;
+
     if (res) {
       if (isEditing) {
-        setTasks((prev = []) =>
-          prev?.map((t) => (t._id === task._id ? res.task : t))
-        );
+        setTasks((prev) => {
+          return prev.map((t) => (t._id === res.task._id ? res.task : t));
+        });
       } else {
-        console.log(
-          res,
-          res.task.assignedTo.name,
-          res.task.assignedTo.name || "a member"
-        );
         socket.emit("new_task", {
           message: `${user.name} has created a new task`,
           workshopId: currentWorkshop,
@@ -166,8 +145,10 @@ export default function CreateEditTaskForm({
       }
       callback(res);
       toast.success(`Task ${isEditing ? "updated" : "created"} successfully!`);
-      form.reset();
-      if (onClose) onClose();
+      setTimeout(() => {
+        form.reset();
+        if (onClose) onClose();
+      }, 0);
     }
     if (error) {
       toast.error(error || "Something went wrong");
@@ -191,6 +172,12 @@ export default function CreateEditTaskForm({
       toast.error(userError.message || "Failed to fetch members");
     }
   }, [userData, userError]);
+
+  useEffect(() => {
+    socket.on("new_member", () => {
+      userRefetch();
+    });
+  }, [socket]);
   return (
     <div className="space-y-4">
       <div className="mb-5 pb-2 border-b">

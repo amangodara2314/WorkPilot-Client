@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { FileQuestion } from "lucide-react";
 
@@ -20,7 +20,7 @@ export default function NotFound() {
         </p>
 
         <Button asChild size="lg" className="mt-4">
-          <Link href="/">Go back home</Link>
+          <Link to="/">Go back home</Link>
         </Button>
       </div>
     </div>

@@ -29,8 +29,6 @@ export default function GlobalContext({ children }) {
   useEffect(() => {
     if (sessionStorage.getItem("accessToken")) {
       socket.on("active_users", (users) => {
-        console.log(users);
-
         setActiveUsers(users);
       });
       socket.on("new_message", (data) => {
@@ -40,10 +38,25 @@ export default function GlobalContext({ children }) {
         });
       });
     }
+
     socket.on("user_disconnected", ({ userId }) => {
-      console.log(userId);
       setActiveUsers((prevUsers) => prevUsers.filter((a) => a._id !== userId));
     });
+
+    socket.on("role_changed", (data) => {
+      toast.info("Your role has been changed to " + data.role.name);
+      setUser((prevUser) => ({
+        ...prevUser,
+        role: data.role.name,
+      }));
+      setPermissions(data.role.permissions);
+    });
+
+    return () => {
+      socket.off("active_users");
+      socket.off("new_message");
+      socket.off("user_disconnected");
+    };
   }, [socket]);
 
   return (

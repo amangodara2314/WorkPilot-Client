@@ -153,13 +153,13 @@ export default function DashboardPage() {
   const { data, error, loading, refetch } = useFetch(
     "/workshop/details/" + params.id
   );
-  if (data) {
-    console.log(data);
-  }
 
-  if (error) {
-    toast.error(error);
-  }
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
+
   useEffect(() => {
     socket.on("new_task", (data) => {
       refetch();

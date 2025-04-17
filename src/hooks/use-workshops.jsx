@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-const getWorkshops = (unauthorized) => {
+const useWorkshops = (unauthorized) => {
   const { API } = useGlobalContext();
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
@@ -12,7 +12,6 @@ const getWorkshops = (unauthorized) => {
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
-    console.log("called workshop");
     try {
       const response = await fetch(API + "/workshop", {
         method: "GET",
@@ -34,7 +33,6 @@ const getWorkshops = (unauthorized) => {
       }
 
       const result = await response.json();
-      console.log("result", result);
 
       if (!response.ok) {
         setError(result.message || "Something went wrong");
@@ -46,13 +44,13 @@ const getWorkshops = (unauthorized) => {
     } finally {
       setLoading(false);
     }
-  }, []); // Empty dependency array
+  }, []);
 
   useEffect(() => {
     fetchData();
-  }, []); // Empty dependency array, only run on mount
+  }, []);
 
   return { data, error, loading, fetchData };
 };
 
-export default getWorkshops;
+export default useWorkshops;

@@ -26,7 +26,7 @@ import { useEffect, useState } from "react";
 import useFetch from "@/hooks/use-fetch";
 import { useGlobalContext } from "@/context/GlobalContext";
 import { toast } from "sonner";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { Skeleton } from "../ui/skeleton";
 import CreateEditTaskForm from "../CreateEditTask";
 import CreateEditProject from "../CreateEditProject";
@@ -36,6 +36,7 @@ import socket from "@/lib/socket";
 export function NavProjects() {
   const { isMobile } = useSidebar();
   const [isOpen, setIsOpen] = useState(false);
+  const { projectId } = useParams();
   const { currentWorkshop, setProjects, projects, permissions } =
     useGlobalContext();
   const { data, error, loading, refetch } = useFetch(
@@ -66,7 +67,6 @@ export function NavProjects() {
 
   useEffect(() => {
     socket.on("new_project", (data) => {
-      console.log(data);
       refetch();
       toast.info(`New Project: ${data.name}`, {
         duration: 8000,
@@ -74,6 +74,9 @@ export function NavProjects() {
           data.createdBy.name || "Anonymous"
         }`,
       });
+    });
+    socket.on("project_updated", (data) => {
+      refetch();
     });
   }, [socket]);
 
@@ -123,15 +126,25 @@ export function NavProjects() {
           projects &&
           projects.length > 0 &&
           projects.map((item) => (
-            <SidebarMenuItem key={item._id}>
+            <SidebarMenuItem
+              key={item._id}
+              className={item._id === projectId ? "bg-muted" : ""}
+            >
               <SidebarMenuButton asChild>
-                <Link
-                  to={`/workshop/${item.workshop}/project/${item._id}`}
-                  title={`/workshop/${item.workshop}/project/${item._id}`}
-                >
-                  <span>{item.emoji}</span>
-                  <span>{item.name}</span>
-                </Link>
+                {item._id === projectId ? (
+                  <div className="selected-link-style">
+                    <span>{item.emoji}</span>
+                    <span>{item.name}</span>
+                  </div>
+                ) : (
+                  <Link
+                    to={`/workshop/${item.workshop}/project/${item._id}`}
+                    title={`/workshop/${item.workshop}/project/${item._id}`}
+                  >
+                    <span>{item.emoji}</span>
+                    <span>{item.name}</span>
+                  </Link>
+                )}
               </SidebarMenuButton>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>

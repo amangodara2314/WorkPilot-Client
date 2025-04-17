@@ -49,7 +49,10 @@ export default function DeleteWorkshopButton() {
   return (
     <AlertDialog>
       <AlertDialogTrigger disabled={loading} asChild>
-        <Button variant="destructive" className="flex items-center gap-2">
+        <Button
+          variant="destructive"
+          className="flex items-center gap-2 w-full sm:w-fit"
+        >
           <Trash2 className="h-4 w-4" />
           Delete Workshop
         </Button>

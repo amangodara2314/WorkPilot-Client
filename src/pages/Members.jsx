@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useGlobalContext } from "@/context/GlobalContext";
 import useFetch from "@/hooks/use-fetch";
+import socket from "@/lib/socket";
 import { Check, ClipboardCopy, CopyIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -48,9 +49,18 @@ export default function Members() {
     }
   }, [error]);
 
+  useEffect(() => {
+    socket.on("new_member", () => {
+      refetch();
+    });
+    socket.on("role_changed", (data) => {
+      refetch();
+    });
+  }, [socket]);
+
   return (
     <div className="flex justify-center">
-      <div className="flex-1 py-6 max-w-[75%] space-y-6">
+      <div className="flex-1 py-6 px-6 md:px-20 lg:px-40 space-y-6">
         <CurrentWorkshop size={16} />
         <Separator className="" />
 
@@ -131,7 +141,7 @@ export default function Members() {
                         </AvatarFallback>
                       </Avatar>
                       <div className="grid flex-1 text-left text-sm leading-tight">
-                        <span className="truncate font-semibold">
+                        <span className="text-wrap font-semibold">
                           {member?.user?.name}
                         </span>
                         <span className="truncate text-xs text-muted-foreground">
@@ -157,9 +167,6 @@ export default function Members() {
 }
 
 const MembersSkeleton = () => {
-  useEffect(() => {
-    console.log("MembersSkeleton");
-  }, []);
   return (
     <div className="space-y-3">
       {Array.from({ length: 3 }).map((_, idx) => (

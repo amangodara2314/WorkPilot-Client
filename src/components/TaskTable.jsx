@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { useState, useEffect, useRef } from "react";
+import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { useParams } from "react-router-dom";
 import CreateEditTaskForm from "@/components/CreateEditTask";
 import { TaskPagination } from "./TaskPagination";
@@ -7,6 +7,7 @@ import { TaskTableBody } from "./TaskTableBody";
 import { TaskTableHeader } from "./TaskTableHeader";
 import { TaskTableHead } from "./TaskTableHead";
 import TaskTableSkeleton from "./TaskTableSkeleton";
+import { DialogTitle } from "@radix-ui/react-dialog";
 
 export default function TaskTable({
   tasks,
@@ -30,9 +31,9 @@ export default function TaskTable({
 }) {
   const rowsPerPage = 5;
   const [selectedTask, setSelectedTask] = useState(null);
-  const params = useParams();
-  const [projectId, setProjectId] = useState(null);
+  const { projectId } = useParams();
 
+  const dialogRef = useRef(null);
   const [columns, setColumns] = useState([
     { id: "select", label: "", visible: true },
     { id: "id", label: "Task", visible: true },
@@ -41,12 +42,6 @@ export default function TaskTable({
     { id: "priority", label: "Priority", visible: true },
     { id: "assignedTo", label: "Assigned To", visible: true },
   ]);
-
-  useEffect(() => {
-    if (params.projectId) {
-      setProjectId(params.projectId);
-    }
-  }, [params]);
 
   const buildQueryParams = (page) => {
     return {
@@ -95,24 +90,37 @@ export default function TaskTable({
     );
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dialogRef.current && !dialogRef.current.contains(event.target)) {
+        setSelectedTask(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
     <div className="w-full max-w-7xl mx-auto">
-      <Dialog
-        modal={true}
-        open={selectedTask !== null}
-        onOpenChange={(isOpen) => {
-          if (!isOpen) setSelectedTask(null);
-        }}
-      >
-        <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-          <CreateEditTaskForm
-            task={selectedTask}
-            isEditing={true}
-            onClose={() => setSelectedTask(null)}
-            setTask={setTasks}
-          />
-        </DialogContent>
-      </Dialog>
+      {selectedTask && (
+        <div className="fixed top-0 w-full left-0 h-full bg-black bg-opacity-70 z-50 flex items-center justify-center">
+          <div
+            ref={dialogRef}
+            className="sm:min-w-[600px] max-h-[90vh] overflow-y-auto bg-white rounded-lg p-6"
+          >
+            <CreateEditTaskForm
+              task={selectedTask}
+              isEditing={true}
+              onClose={() => setSelectedTask(null)}
+              setTasks={setTasks}
+            />
+          </div>
+        </div>
+      )}
 
       <div className="flex flex-col space-y-4">
         {/* Filters */}

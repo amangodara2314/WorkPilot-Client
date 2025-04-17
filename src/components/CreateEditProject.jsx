@@ -77,6 +77,7 @@ export default function CreateEditProject({
       } else {
         callback();
         toast.success("Project updated successfully!");
+        socket.emit("project_updated", data.project);
       }
 
       form.reset();

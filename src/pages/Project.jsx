@@ -17,7 +17,7 @@ import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 
 export default function Project() {
-  const { currentWorkshop } = useGlobalContext();
+  const { currentWorkshop, permissions } = useGlobalContext();
   const params = useParams();
   const [tasks, setTasks] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -101,6 +101,11 @@ export default function Project() {
         description: data?.description,
       });
     });
+    socket.on("project_updated", (data) => {
+      if (params.projectId == data?._id) {
+        refetch();
+      }
+    });
   }, [socket]);
 
   return (
@@ -130,24 +135,26 @@ export default function Project() {
                 {" "}
                 {data?.project?.emoji} {data?.project?.name}{" "}
               </span>
-              <Dialog
-                modal={true}
-                onOpenChange={setIsOpen}
-                open={isOpen}
-                onClick={() => {}}
-              >
-                <DialogTrigger>
-                  <SquarePen className="size-6" />
-                </DialogTrigger>
-                <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-scroll">
-                  <CreateEditProject
-                    project={data?.project}
-                    onClose={() => setIsOpen(false)}
-                    callback={refetch}
-                    mode="edit"
-                  />
-                </DialogContent>
-              </Dialog>
+              {permissions && permissions.project.includes("edit") && (
+                <Dialog
+                  modal={true}
+                  onOpenChange={setIsOpen}
+                  open={isOpen}
+                  onClick={() => {}}
+                >
+                  <DialogTrigger>
+                    <SquarePen className="size-6" />
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-scroll">
+                    <CreateEditProject
+                      project={data?.project}
+                      onClose={() => setIsOpen(false)}
+                      callback={refetch}
+                      mode="edit"
+                    />
+                  </DialogContent>
+                </Dialog>
+              )}
             </h1>
             <span className="text-muted-foreground">
               {data?.project?.description || null}

@@ -153,7 +153,7 @@ export function TaskTableBody({
                           new URLSearchParams(buildQueryParams(currentPage))
                       )
                     }
-                  ></DeleteTask>
+                  />
                   <DropdownMenuItem>
                     <WorkshopLinkTag path={`tasks/${task._id}`}>
                       View Details

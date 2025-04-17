@@ -33,7 +33,6 @@ const useFetch = (
         }
 
         const response = await fetch(API + customUrl, options);
-        console.log("response", response);
 
         if (response.status === 401) {
           toast.error("Session expired. Please login again", {
@@ -47,7 +46,6 @@ const useFetch = (
         }
 
         const result = await response.json();
-        console.log(response, result);
 
         if (!response.ok) {
           throw new Error(result.message || "Request failed");

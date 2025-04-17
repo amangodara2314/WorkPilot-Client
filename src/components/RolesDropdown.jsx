@@ -16,6 +16,7 @@ import { useGlobalContext } from "@/context/GlobalContext";
 import { toast } from "sonner";
 import { set } from "date-fns";
 import { useNavigate } from "react-router-dom";
+import socket from "@/lib/socket";
 
 export default function RolesDropdown({
   member = null,
@@ -36,8 +37,8 @@ export default function RolesDropdown({
         )}`,
       },
       body: JSON.stringify({ role, workshop: currentWorkshop }),
-    }).then((res) => {
-      const data = res.json();
+    }).then(async (res) => {
+      const data = await res.json();
       if (res.status === 401) {
         sessionStorage.removeItem("accessToken");
         navigate("/");
@@ -46,16 +47,22 @@ export default function RolesDropdown({
       if (res.status != 200) {
         throw data;
       }
+      console.log(data);
+      socket.emit("role_changed", {
+        role: data.role,
+        userId: member.user._id,
+      });
       callback();
     });
     try {
       toast.promise(res, {
         loading: "Changing role...",
         success: "Role changed successfully!",
-        error: (err) => err || "Failed to change role",
+        error: (err) => err.message || "Failed to change role",
       });
     } catch (error) {
-      toast.error(error.message || "Something went wrong");
+      console.error("Error changing role:", error);
+      toast.error(error || "Something went wrong");
     } finally {
       setChangingRole(false);
     }

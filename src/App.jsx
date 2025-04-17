@@ -12,12 +12,12 @@ import Signup from "./pages/auth/Signup";
 import Login from "./pages/auth/Login";
 import GoogleAuthProvider from "./components/auth/GoogleAuthProvider";
 import RouteHandler from "./components/RouteHandler";
-import getWorkshops from "./hooks/get-workshops";
 import { useGlobalContext } from "./context/GlobalContext";
 import { useEffect } from "react";
 import ShowTask from "./pages/ShowTask";
 import Project from "./pages/Project";
 import JoinWorkshop from "./pages/JoinWorkshop";
+import NotFound from "./pages/NotFound";
 
 function App() {
   const routes = createBrowserRouter([
@@ -77,7 +77,7 @@ function App() {
     },
     {
       path: "*",
-      elementL: <div>404</div>,
+      element: <NotFound />,
     },
   ]);
   return (

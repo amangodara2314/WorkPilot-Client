@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useGlobalContext } from "@/context/GlobalContext";
+import socket from "@/lib/socket";
 
 export default function JoinWorkshop() {
   const { API, setCurrentWorkshop, setCurrentWorkshopDetails } =
@@ -55,6 +56,7 @@ export default function JoinWorkshop() {
             setMessage("You have successfully joined the workshop!");
             setCurrentWorkshop(data.workshop._id);
             setCurrentWorkshopDetails(data.workshop);
+            socket.emit("new_member", { workshop: data.workshop._id });
             navigate("/workshop/" + data.workshop._id);
           } else {
             setStatus("error");
