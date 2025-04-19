@@ -1,4 +1,3 @@
-// DeleteProjectDialog.jsx
 import { useState } from "react";
 import {
   Dialog,
@@ -14,15 +13,18 @@ import { Trash2 } from "lucide-react";
 import { useGlobalContext } from "@/context/GlobalContext";
 import { toast } from "sonner";
 import { useNavigate, useParams } from "react-router-dom";
+import socket from "@/lib/socket";
 
 export default function DeleteProjectDialog({
   projectId,
   callback = () => {},
+  setOpenDrop,
+  open,
+  setOpen,
 }) {
   const params = useParams();
   const navigate = useNavigate();
-  const { API, setTasks } = useGlobalContext();
-  const [open, setOpen] = useState(false);
+  const { API, setTasks, currentWorkshop } = useGlobalContext();
 
   const handleConfirm = () => {
     const res = fetch(API + "/project/" + projectId, {
@@ -40,6 +42,7 @@ export default function DeleteProjectDialog({
       if (res.status != 200) {
         throw res.json();
       }
+      socket.emit("project_deleted", { projectId, workshop: currentWorkshop });
       if (params.projectId === projectId) {
         setTasks(null);
         navigate("/workshop/" + params?.id);
@@ -60,18 +63,6 @@ export default function DeleteProjectDialog({
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            setOpen(true);
-          }}
-          className="flex items-center w-full"
-        >
-          <Trash2 className="mr-2 h-4 w-4" />
-          Delete
-        </button>
-      </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Are you absolutely sure?</DialogTitle>

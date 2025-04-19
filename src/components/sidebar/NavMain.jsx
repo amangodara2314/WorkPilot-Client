@@ -2,6 +2,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import {
   CircleCheck,
@@ -24,6 +25,7 @@ const items = [
 export function NavMain() {
   const { currentWorkshop, permissions } = useGlobalContext();
   const location = useLocation();
+  const { isMobile, setOpenMobile } = useSidebar();
 
   const normalizedPath = location.pathname.endsWith("/")
     ? location.pathname.slice(0, -1)
@@ -47,6 +49,11 @@ export function NavMain() {
           <SidebarMenuItem key={item.title}>
             <SidebarMenuButton asChild isActive={isActive}>
               <WorkshopLinkTag
+                onClick={() => {
+                  if (isMobile) {
+                    setOpenMobile(false);
+                  }
+                }}
                 path={
                   item.title !== "Dashboard" ? item.title.toLowerCase() : ""
                 }

@@ -72,7 +72,7 @@ export default function CreateEditProject({
     if (data) {
       if (mode === "create") {
         socket.emit("new_project", data.project);
-        setProjects((prev) => [...prev, data.project]);
+        setProjects((prev) => [data.project, ...prev]);
         toast.success("Project created successfully!");
       } else {
         callback();

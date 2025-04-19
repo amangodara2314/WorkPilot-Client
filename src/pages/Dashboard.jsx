@@ -168,6 +168,15 @@ export default function DashboardPage() {
         description: data?.description,
       });
     });
+    socket.on("task_updated", (data) => {
+      refetch();
+    });
+    socket.on("task_deleted", (data) => {
+      refetch();
+    });
+    socket.on("project_deleted", (data) => {
+      refetch();
+    });
   }, [socket]);
   return (
     <div className="flex flex-col">

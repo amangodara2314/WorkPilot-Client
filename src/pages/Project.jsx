@@ -62,7 +62,6 @@ export default function Project() {
 
   useEffect(() => {
     if (taskData) {
-      console.log(taskData);
       setTasks(taskData.tasks);
       setTotalTasks(taskData.totalCount || taskData.tasks.length);
       setHasNextPage(taskData.tasks.length >= 5);
@@ -101,6 +100,12 @@ export default function Project() {
         description: data?.description,
       });
     });
+    socket.on("task_updated", (data) => {
+      if (params.projectId == data.project) {
+        fetchTasks();
+      }
+    });
+
     socket.on("project_updated", (data) => {
       if (params.projectId == data?._id) {
         refetch();

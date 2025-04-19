@@ -30,7 +30,7 @@ export function DatePicker({ form, name, label, description, disabled }) {
         };
 
         return (
-          <FormItem className="flex flex-col">
+          <FormItem className="flex flex-col no-close">
             <FormLabel>{label}</FormLabel>
             <FormControl>
               <div className="relative">

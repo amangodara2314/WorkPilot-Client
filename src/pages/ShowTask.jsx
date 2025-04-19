@@ -1,3 +1,5 @@
+"use client";
+
 import { motion } from "framer-motion";
 import { format } from "date-fns";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -5,11 +7,8 @@ import { Separator } from "@/components/ui/separator";
 import {
   CalendarDays,
   Flag,
-  GitPullRequest,
-  MessageSquare,
   Users,
   FolderKanban,
-  ArrowRight,
   Badge,
   Info,
   SquarePen,
@@ -19,7 +18,6 @@ import { useParams } from "react-router-dom";
 import { TaskSkeleton } from "@/components/TaskSkeleton";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import CreateEditTaskForm from "@/components/CreateEditTask";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 
@@ -76,15 +74,15 @@ function ShowTask() {
           />
         </DialogContent>
       </Dialog>
-      <main className="max-w-[1800px] mx-auto px-6 py-8">
+      <main className="max-w-[1800px] mx-auto px-4 sm:px-6 py-4 sm:py-8">
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8 flex items-center justify-between"
+          className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
         >
           <div className="flex items-center gap-2 truncate">
             {" "}
-            <h1 className="text-2xl font-semibold text-gray-900 mb-2">
+            <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-0">
               {data.task?.title}
             </h1>
             <button onClick={() => setOpen(true)} className="text-gray-900">
@@ -105,21 +103,21 @@ function ShowTask() {
           </div>
         </motion.div>
 
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="col-span-2 space-y-6"
+            className="col-span-1 md:col-span-2 space-y-6"
           >
-            <div className="bg-white rounded-lg border p-6">
+            <div className="bg-white rounded-lg border p-4 sm:p-6">
               <h2 className="text-base font-medium mb-4">Description</h2>
               <p className="text-sm text-gray-600 leading-relaxed">
                 {data.task?.description}
               </p>
             </div>
 
-            <div className="flex justify-between gap-6">
-              <div className="bg-white rounded-lg border p-6 flex-1">
+            <div className="flex flex-col sm:flex-row justify-between gap-6">
+              <div className="bg-white rounded-lg border p-4 sm:p-6 flex-1">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-sm font-medium text-gray-500">Project</h2>
                   <FolderKanban className="h-4 w-4 text-gray-400" />
@@ -134,7 +132,7 @@ function ShowTask() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg border p-6 flex-1">
+              <div className="bg-white rounded-lg border p-4 sm:p-6 flex-1">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-sm font-medium text-gray-500">
                     Assigned To
@@ -144,7 +142,10 @@ function ShowTask() {
                 <div className="flex items-center gap-2">
                   <Avatar className="h-8 w-8 rounded-full">
                     <AvatarImage
-                      src={data.task?.assignedTo?.profileImage}
+                      src={
+                        data.task?.assignedTo?.profileImage ||
+                        "/placeholder.svg"
+                      }
                       alt={data.task?.assignedTo?.name}
                     />
                     <AvatarFallback className="rounded-full">CN</AvatarFallback>
@@ -193,7 +194,7 @@ function ShowTask() {
             animate={{ opacity: 1, y: 0 }}
             className="space-y-6"
           >
-            <div className="bg-white rounded-lg border p-6">
+            <div className="bg-white rounded-lg border p-4 sm:p-6">
               <h2 className="text-sm font-medium text-gray-500 mb-4">
                 Task Details
               </h2>

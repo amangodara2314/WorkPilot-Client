@@ -92,7 +92,12 @@ export default function TaskTable({
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (dialogRef.current && !dialogRef.current.contains(event.target)) {
+      // if (event.target.closest(".no-close")) return;
+
+      if (
+        dialogRef.current &&
+        dialogRef.current.classList.contains("dialog-cont")
+      ) {
         setSelectedTask(null);
       }
     };
@@ -105,12 +110,20 @@ export default function TaskTable({
   }, []);
 
   return (
-    <div className="w-full max-w-7xl mx-auto">
+    <div className="w-full">
       {selectedTask && (
-        <div className="fixed top-0 w-full left-0 h-full bg-black bg-opacity-70 z-50 flex items-center justify-center">
+        <div
+          className="fixed top-0 w-full left-0 h-full bg-black bg-opacity-70 z-50 flex items-center justify-center dialog-cont"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setSelectedTask(null);
+            }
+          }}
+        >
           <div
             ref={dialogRef}
             className="sm:min-w-[600px] max-h-[90vh] overflow-y-auto bg-white rounded-lg p-6"
+            onClick={(e) => e.stopPropagation()}
           >
             <CreateEditTaskForm
               task={selectedTask}
@@ -121,9 +134,7 @@ export default function TaskTable({
           </div>
         </div>
       )}
-
       <div className="flex flex-col space-y-4">
-        {/* Filters */}
         <TaskTableHeader
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
@@ -136,7 +147,6 @@ export default function TaskTable({
           resetFilters={resetFilters}
         />
 
-        {/* Tasks Table */}
         <div className="rounded-md border">
           <div className="w-full overflow-auto">
             <table className="w-full caption-bottom text-sm">
@@ -163,7 +173,6 @@ export default function TaskTable({
           </div>
         </div>
 
-        {/* Pagination */}
         <TaskPagination
           selectedTasks={selectedTasks}
           tasks={tasks}

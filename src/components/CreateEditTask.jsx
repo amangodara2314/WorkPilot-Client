@@ -130,6 +130,7 @@ export default function CreateEditTaskForm({
 
     if (res) {
       if (isEditing) {
+        socket.emit("task_updated", res.task);
         setTasks((prev) => {
           return prev.map((t) => (t._id === res.task._id ? res.task : t));
         });
@@ -179,7 +180,7 @@ export default function CreateEditTaskForm({
     });
   }, [socket]);
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 no-close">
       <div className="mb-5 pb-2 border-b">
         <h1 className="text-xl tracking-[-0.16px] dark:text-[#fcfdffef] font-semibold mb-1">
           {isEditing ? "Edit Task" : "Create Task"}
@@ -199,7 +200,11 @@ export default function CreateEditTaskForm({
               <FormItem>
                 <FormLabel>Task Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="Enter task title" {...field} />
+                  <Input
+                    className="no-close"
+                    placeholder="Enter task title"
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -209,13 +214,14 @@ export default function CreateEditTaskForm({
           <FormField
             control={form.control}
             name="description"
+            className="no-close"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Description</FormLabel>
                 <FormControl>
                   <Textarea
                     placeholder="Provide a detailed description of the task"
-                    className="min-h-[100px]"
+                    className="min-h-[100px] no-close"
                     {...field}
                   />
                 </FormControl>
@@ -234,11 +240,11 @@ export default function CreateEditTaskForm({
                   defaultValue={task ? task.badge : ""}
                 >
                   <FormControl>
-                    <SelectTrigger>
+                    <SelectTrigger className="">
                       <SelectValue placeholder="Select badge type" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
+                  <SelectContent className="no-close">
                     <SelectItem value="Bug">Bug</SelectItem>
                     <SelectItem value="Feature">Feature</SelectItem>
                     <SelectItem value="Documentation">Documentation</SelectItem>
@@ -265,7 +271,7 @@ export default function CreateEditTaskForm({
                       <SelectValue placeholder="Select project" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
+                  <SelectContent className="no-close">
                     {projects?.map((project) => (
                       <SelectItem
                         className="truncate"
@@ -285,6 +291,7 @@ export default function CreateEditTaskForm({
           <FormField
             control={form.control}
             name="status"
+            className="no-close"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Status</FormLabel>
@@ -297,7 +304,7 @@ export default function CreateEditTaskForm({
                       <SelectValue placeholder="Select status" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
+                  <SelectContent className="no-close">
                     <SelectItem value="pending">Pending</SelectItem>
                     <SelectItem value="in-progress">In Progress</SelectItem>
                     <SelectItem value="in-review">In Review</SelectItem>
@@ -313,6 +320,7 @@ export default function CreateEditTaskForm({
           <FormField
             control={form.control}
             name="priority"
+            className="no-close"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Priority</FormLabel>
@@ -325,7 +333,7 @@ export default function CreateEditTaskForm({
                       <SelectValue placeholder="Select priority" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
+                  <SelectContent className="no-close">
                     <SelectItem value="low">Low</SelectItem>
                     <SelectItem value="medium">Medium</SelectItem>
                     <SelectItem value="high">High</SelectItem>
@@ -339,6 +347,7 @@ export default function CreateEditTaskForm({
           <FormField
             control={form.control}
             name="assignedTo"
+            className="no-close"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Assigned To</FormLabel>
@@ -352,7 +361,7 @@ export default function CreateEditTaskForm({
                       <SelectValue placeholder="Select team member" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
+                  <SelectContent className="no-close">
                     {userLoading && (
                       <div className="h-10 animate-pulse text-center">
                         Loading...

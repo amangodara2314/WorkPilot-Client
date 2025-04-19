@@ -2,6 +2,7 @@ import { useGlobalContext } from "@/context/GlobalContext";
 import { DropdownMenuItem } from "./ui/dropdown-menu";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import socket from "@/lib/socket";
 
 export default function DeleteTask({ id, refetch }) {
   const { API, currentWorkshop } = useGlobalContext();
@@ -26,6 +27,10 @@ export default function DeleteTask({ id, refetch }) {
         if (response.status != 200) {
           throw new Error(result.message || "Something went wrong");
         }
+        socket.emit("task_deleted", {
+          taskId: id,
+          workshopId: currentWorkshop,
+        });
         refetch();
       })
       .catch((error) => {

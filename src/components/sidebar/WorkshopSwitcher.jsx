@@ -35,10 +35,16 @@ export function WorkshopSwitcher({}) {
     currentWorkshopDetails,
     API,
     setTasks,
+    setPermissions,
+    setMembers,
+    user,
+    setUser,
   } = useGlobalContext();
   const { data, error } = useWorkshops();
   const [isOpen, setIsOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+
   const navigate = useNavigate();
 
   React.useEffect(() => {
@@ -54,10 +60,6 @@ export function WorkshopSwitcher({}) {
       );
     }
   }, [data, error]);
-
-  React.useEffect(() => {
-    console.log(open);
-  }, [open]);
 
   const changeWorkshop = async (id) => {
     setIsLoading(true);
@@ -79,7 +81,10 @@ export function WorkshopSwitcher({}) {
         prevWorkshopId: currentWorkshop,
       });
       setTasks(null);
+      setUser({ ...user, role: result.member.role.name });
+      setPermissions(result.member.role.permissions);
       setCurrentWorkshop(id);
+      setMembers(null);
       setCurrentWorkshopDetails(
         data.workshops.find((w) => w.workshop._id === id)
       );
@@ -123,99 +128,103 @@ export function WorkshopSwitcher({}) {
   }
 
   return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild disabled={isLoading}>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground w-full"
-            >
-              {/* For icon/logo - could be shown in both open and expanded states */}
-              {/* <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+    <>
+      <Dialog modal={true} open={isOpen} onOpenChange={setIsOpen}>
+        <DialogContent className="cursor-pointer sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+          <CreateWorkshopForm
+            onClose={() => setIsOpen(false)}
+            workshop={workshops}
+            setWorkshops={setWorkshops}
+            changeWorkshop={changeWorkshop}
+          />
+        </DialogContent>
+      </Dialog>
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
+            <DropdownMenuTrigger asChild disabled={isLoading}>
+              <SidebarMenuButton
+                onClick={() => setIsDropdownOpen((prev) => !prev)}
+                size="lg"
+                className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground w-full"
+              >
+                {/* For icon/logo - could be shown in both open and expanded states */}
+                {/* <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                 <activeWorkshop.logo className="size-4" />
-              </div> */}
+                </div> */}
 
-              {open ? (
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate text-primary font-semibold">
-                    {currentWorkshopDetails?.name
-                      ? currentWorkshopDetails?.name
-                      : currentWorkshopDetails?.workshop?.name}
-                  </span>
-                  <span className="truncate text-xs">Free</span>
-                </div>
-              ) : null}
+                {open ? (
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate text-primary font-semibold">
+                      {currentWorkshopDetails?.name
+                        ? currentWorkshopDetails?.name
+                        : currentWorkshopDetails?.workshop?.name}
+                    </span>
+                    <span className="truncate text-xs">Free</span>
+                  </div>
+                ) : null}
 
-              {open ? (
-                <ChevronsUpDown className="ml-auto size-4" />
-              ) : (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex w-full justify-center items-center">
-                      <ChevronsUpDown className="size-4" />
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    {currentWorkshopDetails?.name ||
-                      currentWorkshopDetails?.workshop?.name}
-                  </TooltipContent>
-                </Tooltip>
-              )}
-            </SidebarMenuButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
-            align="start"
-            side={"bottom"}
-            sideOffset={4}
-          >
-            <DropdownMenuLabel className="text-xs text-muted-foreground">
-              Workshops
-            </DropdownMenuLabel>
-            {data &&
-              workshops.map((workshop, index) => {
-                if (workshop?.workshop?._id === currentWorkshop) return null;
-                return (
-                  <DropdownMenuItem
-                    key={workshop?.workshop?.name || index}
-                    onClick={() => {
-                      changeWorkshop(workshop?.workshop?._id);
-                    }}
-                    className="gap-2 p-2 text-sm truncate cursor-pointer"
-                  >
-                    {workshop?.workshop?.name}
-                  </DropdownMenuItem>
-                );
-              })}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="gap-2 p-2"
-              onSelect={(e) => {
-                e.preventDefault(); // prevents menu from closing immediately
-                setIsOpen(true);
-              }}
+                {open ? (
+                  <ChevronsUpDown className="ml-auto size-4" />
+                ) : (
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex w-full justify-center items-center">
+                        <ChevronsUpDown className="size-4" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      {currentWorkshopDetails?.name ||
+                        currentWorkshopDetails?.workshop?.name}
+                    </TooltipContent>
+                  </Tooltip>
+                )}
+              </SidebarMenuButton>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
+              align="start"
+              side={"bottom"}
+              sideOffset={4}
             >
-              <div className="flex size-6 items-center justify-center rounded-md border bg-background">
-                <Plus className="size-4" />
-              </div>
-              <div className="font-medium text-muted-foreground">
-                Add Workshop
-              </div>
-            </DropdownMenuItem>
-
-            <Dialog modal={true} open={isOpen} onOpenChange={setIsOpen}>
-              <DialogContent className="cursor-pointer sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-                <CreateWorkshopForm
-                  onClose={() => setIsOpen(false)}
-                  workshop={workshops}
-                  setWorkshops={setWorkshops}
-                />
-              </DialogContent>
-            </Dialog>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </SidebarMenuItem>
-    </SidebarMenu>
+              <DropdownMenuLabel className="text-xs text-muted-foreground">
+                Workshops
+              </DropdownMenuLabel>
+              {data &&
+                workshops.map((workshop, index) => {
+                  if (workshop?.workshop?._id === currentWorkshop) return null;
+                  return (
+                    <DropdownMenuItem
+                      key={workshop?.workshop?.name || index}
+                      onClick={() => {
+                        changeWorkshop(workshop?.workshop?._id);
+                      }}
+                      className="gap-2 p-2 text-sm truncate cursor-pointer"
+                    >
+                      {workshop?.workshop?.name}
+                    </DropdownMenuItem>
+                  );
+                })}
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="gap-2 p-2"
+                onSelect={(e) => {
+                  e.preventDefault();
+                  setIsOpen(true);
+                  setIsDropdownOpen(false);
+                }}
+              >
+                <div className="flex size-6 items-center justify-center rounded-md border bg-background">
+                  <Plus className="size-4" />
+                </div>
+                <div className="font-medium text-muted-foreground">
+                  Add Workshop
+                </div>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    </>
   );
 }

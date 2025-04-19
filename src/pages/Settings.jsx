@@ -22,8 +22,13 @@ export default function Settings() {
 
   useEffect(() => {
     if (currentWorkshopDetails) {
-      setWorkshopName(currentWorkshopDetails.name);
-      setDescription(currentWorkshopDetails.description);
+      setWorkshopName(
+        currentWorkshopDetails?.workshop?.name ?? currentWorkshopDetails?.name
+      );
+      setDescription(
+        currentWorkshopDetails?.workshop?.description ??
+          currentWorkshopDetails?.description
+      );
     }
   }, [currentWorkshopDetails]);
 

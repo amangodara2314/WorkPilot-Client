@@ -90,6 +90,15 @@ export default function Tasks() {
         description: data?.description,
       });
     });
+    socket.on("task_updated", (data) => {
+      refetch();
+    });
+    socket.on("task_deleted", (data) => {
+      refetch();
+    });
+    socket.on("project_deleted", (data) => {
+      refetch();
+    });
   }, [socket]);
   return (
     <div className="w-full h-full flex-col space-y-8 p-6">

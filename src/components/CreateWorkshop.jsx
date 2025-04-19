@@ -26,7 +26,11 @@ const workshopFormSchema = z.object({
   description: z.string().optional(),
 });
 
-export default function CreateWorkshopForm({ onClose, setWorkshops }) {
+export default function CreateWorkshopForm({
+  onClose,
+  setWorkshops,
+  changeWorkshop,
+}) {
   const { currentWorkshop } = useGlobalContext();
   const [formData, setFormData] = useState(null);
   const { data, error, loading, refetch } = useFetch(
@@ -53,9 +57,8 @@ export default function CreateWorkshopForm({ onClose, setWorkshops }) {
 
   useEffect(() => {
     if (data) {
-      console.log(data.workshop.workshop._id);
       setWorkshops((w) => [...w, data.workshop]);
-
+      // changeWorkshop(data.workshop._id);
       setFormData(null);
       form.reset();
       onClose();
