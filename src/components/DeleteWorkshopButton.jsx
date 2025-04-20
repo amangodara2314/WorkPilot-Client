@@ -16,10 +16,19 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Button } from "./ui/button";
+import socket from "@/lib/socket";
 
 export default function DeleteWorkshopButton() {
-  const { setCurrentWorkshop, currentWorkshop, setCurrentWorkshopDetails } =
-    useGlobalContext();
+  const {
+    setCurrentWorkshop,
+    currentWorkshop,
+    setCurrentWorkshopDetails,
+    setPermissions,
+    setWorkshops,
+    setUser,
+    user,
+    workshops,
+  } = useGlobalContext();
   const navigate = useNavigate();
   const { data, loading, error, refetch } = useFetch(
     "/workshop/" + currentWorkshop,
@@ -34,8 +43,11 @@ export default function DeleteWorkshopButton() {
   );
   useEffect(() => {
     if (data) {
-      console.log(data, data.userWorkshop);
+      socket.emit("workshop_deleted", currentWorkshop);
+      setWorkshops(workshops.filter((w) => w._id !== currentWorkshop));
       setCurrentWorkshopDetails(data.userWorkshop);
+      setPermissions(data?.permissions);
+      setUser({ ...user, role: data?.role || "Member" });
       setCurrentWorkshop(data.userWorkshop._id);
       toast.success("Workshop deleted successfully!", {
         description: "You will be redirected to the homepage of other workshop",

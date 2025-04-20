@@ -28,18 +28,20 @@ const RouteHandler = () => {
             },
           });
           const result = await response.json();
-          setCurrentWorkshop(result.user.currentWorkshop._id);
-          setCurrentWorkshopDetails(result.user.currentWorkshop);
-          setUser(result.user);
-          setPermissions(result.permissions);
-          socket.emit("join_room", {
-            user: result.user,
-            workshopId: result.user.currentWorkshop._id,
-          });
+          if (response.status == 200) {
+            setCurrentWorkshop(result.user.currentWorkshop._id);
+            setCurrentWorkshopDetails(result.user.currentWorkshop);
+            setUser(result.user);
+            setPermissions(result.permissions);
+            socket.emit("join_room", {
+              user: result.user,
+              workshopId: result.user.currentWorkshop._id,
+            });
 
-          if (result.user.currentWorkshop) {
-            if (window.location.pathname === "/") {
-              navigate(`/workshop/${result.user.currentWorkshop._id}`);
+            if (result.user.currentWorkshop) {
+              if (window.location.pathname === "/") {
+                navigate(`/workshop/${result.user.currentWorkshop._id}`);
+              }
             }
           }
         } catch (error) {

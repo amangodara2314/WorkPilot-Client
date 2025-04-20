@@ -49,8 +49,9 @@ export function LoginForm({ className, ...props }) {
 
       sessionStorage.setItem("accessToken", JSON.stringify(data.token));
 
-      if (redirect) {
-        navigate(redirect);
+      if (redirect != "") {
+        console.log("redirecting to join");
+        navigate("/" + redirect);
       } else {
         navigate("/workshop/" + data.user.currentWorkshop);
       }
@@ -117,7 +118,7 @@ export function LoginForm({ className, ...props }) {
             Or continue with
           </span>
         </div>
-        <GoogleAuthButton type={"login"} />
+        <GoogleAuthButton type={"login"} redirect={redirect} />
       </div>
       <div className="text-center text-sm">
         Don't have an account?{" "}

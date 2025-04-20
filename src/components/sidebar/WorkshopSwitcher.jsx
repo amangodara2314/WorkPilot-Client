@@ -51,7 +51,7 @@ export function WorkshopSwitcher({}) {
     if (data) {
       setWorkshops(data.workshops);
       setCurrentWorkshopDetails(
-        data.workshops.find((w) => w.workshop._id === currentWorkshop)
+        data.workshops.find((w) => w._id === currentWorkshop)
       );
     }
     if (error) {
@@ -85,9 +85,7 @@ export function WorkshopSwitcher({}) {
       setPermissions(result.member.role.permissions);
       setCurrentWorkshop(id);
       setMembers(null);
-      setCurrentWorkshopDetails(
-        data.workshops.find((w) => w.workshop._id === id)
-      );
+      setCurrentWorkshopDetails(data.workshops.find((w) => w._id === id));
       navigate("/workshop/" + id);
       return result;
     });
@@ -101,7 +99,6 @@ export function WorkshopSwitcher({}) {
     try {
       await workshopPromise;
     } catch (error) {
-      toast.error(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -117,7 +114,7 @@ export function WorkshopSwitcher({}) {
     );
   }
 
-  if (!data || !workshops || !currentWorkshopDetails) {
+  if (!data || !workshops) {
     return (
       <SidebarMenu>
         <SidebarMenuItem>
@@ -156,9 +153,7 @@ export function WorkshopSwitcher({}) {
                 {open ? (
                   <div className="grid flex-1 text-left text-sm leading-tight">
                     <span className="truncate text-primary font-semibold">
-                      {currentWorkshopDetails?.name
-                        ? currentWorkshopDetails?.name
-                        : currentWorkshopDetails?.workshop?.name}
+                      {currentWorkshopDetails?.name}
                     </span>
                     <span className="truncate text-xs">Free</span>
                   </div>
@@ -174,8 +169,7 @@ export function WorkshopSwitcher({}) {
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
-                      {currentWorkshopDetails?.name ||
-                        currentWorkshopDetails?.workshop?.name}
+                      {currentWorkshopDetails?.name || "Something went wrong"}
                     </TooltipContent>
                   </Tooltip>
                 )}
@@ -192,16 +186,16 @@ export function WorkshopSwitcher({}) {
               </DropdownMenuLabel>
               {data &&
                 workshops.map((workshop, index) => {
-                  if (workshop?.workshop?._id === currentWorkshop) return null;
+                  if (workshop?._id === currentWorkshop) return null;
                   return (
                     <DropdownMenuItem
-                      key={workshop?.workshop?.name || index}
+                      key={workshop?.name || index}
                       onClick={() => {
-                        changeWorkshop(workshop?.workshop?._id);
+                        changeWorkshop(workshop?._id);
                       }}
                       className="gap-2 p-2 text-sm truncate cursor-pointer"
                     >
-                      {workshop?.workshop?.name}
+                      {workshop?.name}
                     </DropdownMenuItem>
                   );
                 })}

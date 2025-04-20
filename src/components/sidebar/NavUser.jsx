@@ -31,11 +31,14 @@ import socket from "@/lib/socket";
 
 export function NavUser() {
   const { isMobile } = useSidebar();
-  const { user } = useGlobalContext();
+  const { user, setTasks, setProjects, setMembers } = useGlobalContext();
   const navigate = useNavigate();
   const handleLogout = () => {
     socket.emit("manual_disconnect");
     sessionStorage.removeItem("accessToken");
+    setTasks(null);
+    setProjects(null);
+    setMembers(null);
     navigate("/auth/login");
   };
   return (

@@ -56,7 +56,9 @@ const taskFormSchema = z.object({
       required_error: "Please select a priority level.",
     })
     .default("low"),
-  dueDate: z.date().optional(),
+  dueDate: z.date({
+    required_error: "Please select a due date.",
+  }),
 });
 
 export default function CreateEditTaskForm({
@@ -86,8 +88,15 @@ export default function CreateEditTaskForm({
 
   const url = isEditing && task ? "/task/" + task._id : "/task";
   const method = isEditing && task ? "PUT" : "POST";
-  const { projects, members, setMembers, currentWorkshop, permissions, user } =
-    useGlobalContext();
+  const {
+    projects,
+    members,
+    setMembers,
+    currentWorkshop,
+    permissions,
+    setProjects,
+    user,
+  } = useGlobalContext();
 
   const {
     data: res,
@@ -158,6 +167,36 @@ export default function CreateEditTaskForm({
   function onSubmit(data) {
     refetch({ ...data, workshop: currentWorkshop });
   }
+  const {
+    data: projectData,
+    error: projectError,
+    loading: projectLoading,
+    refetch: fetchProjects,
+  } = useFetch(
+    "/project/" + currentWorkshop,
+    {
+      headers: {
+        Authorization:
+          "Bearer " + JSON.parse(sessionStorage.getItem("accessToken")),
+      },
+    },
+    false
+  );
+
+  useEffect(() => {
+    if (currentWorkshop) {
+      fetchProjects();
+    }
+  }, [currentWorkshop]);
+
+  useEffect(() => {
+    if (projectData) {
+      setProjects(projectData.projects);
+    }
+    if (projectError) {
+      toast.error(projectError || "Failed to fetch projects");
+    }
+  }, [projectData, projectError]);
 
   useEffect(() => {
     if (!members) {
@@ -272,15 +311,25 @@ export default function CreateEditTaskForm({
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent className="no-close">
-                    {projects?.map((project) => (
-                      <SelectItem
-                        className="truncate"
-                        key={project._id}
-                        value={project._id}
-                      >
-                        {project.emoji} {project.name}
-                      </SelectItem>
-                    ))}
+                    {projectLoading && !projects ? (
+                      <div className="text-center text-sm text-muted-foreground py-4">
+                        Loading...
+                      </div>
+                    ) : projects?.length === 0 ? (
+                      <div className="text-center text-sm text-muted-foreground py-4">
+                        Please create a project before creating a task
+                      </div>
+                    ) : (
+                      projects?.map((project) => (
+                        <SelectItem
+                          className="truncate"
+                          key={project._id}
+                          value={project._id}
+                        >
+                          {project.emoji} {project.name}
+                        </SelectItem>
+                      ))
+                    )}
                   </SelectContent>
                 </Select>
                 <FormMessage />

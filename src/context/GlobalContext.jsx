@@ -52,6 +52,12 @@ export default function GlobalContext({ children }) {
       setPermissions(data.role.permissions);
     });
 
+    socket.on("workshop_deleted", () => {
+      toast.error("This workshop has been deleted by the owner", {
+        description: "Please select another workshop",
+      });
+    });
+
     return () => {
       socket.off("active_users");
       socket.off("new_message");

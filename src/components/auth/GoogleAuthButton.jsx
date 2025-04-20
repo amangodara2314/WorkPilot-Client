@@ -3,12 +3,17 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { Button } from "../ui/button";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function GoogleAuthButton({ type, redirect = "" }) {
   const { API } = useGlobalContext();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log(redirect);
+  }, [redirect]);
+
   const registerWithGoogle = async (response) => {
     setLoading(true);
     try {

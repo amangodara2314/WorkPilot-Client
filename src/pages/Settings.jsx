@@ -16,6 +16,7 @@ export default function Settings() {
     currentWorkshop,
     setCurrentWorkshop,
     setCurrentWorkshopDetails,
+    permissions,
   } = useGlobalContext();
   const [workshopName, setWorkshopName] = useState("");
   const [description, setDescription] = useState("");
@@ -113,7 +114,9 @@ export default function Settings() {
           </div>
 
           <div className="flex md:flex-row flex-wrap items-center justify-end gap-4">
-            <DeleteWorkshopButton />
+            {permissions && permissions.workshop.includes("delete") && (
+              <DeleteWorkshopButton />
+            )}
             <Button
               onClick={handleSave}
               disabled={loading}

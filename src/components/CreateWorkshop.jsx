@@ -58,7 +58,7 @@ export default function CreateWorkshopForm({
   useEffect(() => {
     if (data) {
       setWorkshops((w) => [...w, data.workshop]);
-      // changeWorkshop(data.workshop._id);
+      // changeWorkshop(data.workshop._id)
       setFormData(null);
       form.reset();
       onClose();
