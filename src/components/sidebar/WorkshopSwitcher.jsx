@@ -62,6 +62,8 @@ export function WorkshopSwitcher({}) {
   }, [data, error]);
 
   const changeWorkshop = async (id) => {
+    console.log(id);
+
     setIsLoading(true);
 
     const workshopPromise = fetch(`${API}/workshop/change/${id}`, {
@@ -85,7 +87,7 @@ export function WorkshopSwitcher({}) {
       setPermissions(result.member.role.permissions);
       setCurrentWorkshop(id);
       setMembers(null);
-      setCurrentWorkshopDetails(data.workshops.find((w) => w._id === id));
+      setCurrentWorkshopDetails(result.workshop);
       navigate("/workshop/" + id);
       return result;
     });

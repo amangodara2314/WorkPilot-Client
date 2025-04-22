@@ -146,6 +146,7 @@ export function TaskTableBody({
                   </DropdownMenuItem>
                   <DeleteTask
                     id={task._id}
+                    task={task}
                     refetch={() =>
                       refetch(
                         null,

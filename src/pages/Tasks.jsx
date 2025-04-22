@@ -26,6 +26,7 @@ export default function Tasks() {
     hasNextPage,
     setHasNextPage,
     permissions,
+    user,
   } = useGlobalContext();
 
   const buildQueryParams = (page) => {
@@ -83,23 +84,48 @@ export default function Tasks() {
   }, [currentWorkshop]);
 
   useEffect(() => {
-    socket.on("new_task", (data) => {
+    if (!user) return;
+
+    const handleNewTask = (data) => {
+      if (user.role === "Member" && data.task.assignedTo === user._id) {
+        refetch();
+      } else {
+        refetch();
+      }
+    };
+
+    const handleTaskUpdated = (data) => {
+      if (user.role === "Member" && data.assignedTo === user._id) {
+        refetch();
+      } else {
+        refetch();
+      }
+    };
+
+    const handleTaskDeleted = (data) => {
+      if (user.role === "Member" && data.task.assignedTo === user._id) {
+        refetch();
+      } else {
+        refetch();
+      }
+    };
+
+    const handleProjectDeleted = () => {
       refetch();
-      toast.info(data.message, {
-        duration: 8000,
-        description: data?.description,
-      });
-    });
-    socket.on("task_updated", (data) => {
-      refetch();
-    });
-    socket.on("task_deleted", (data) => {
-      refetch();
-    });
-    socket.on("project_deleted", (data) => {
-      refetch();
-    });
-  }, [socket]);
+    };
+
+    socket.on("new_task", handleNewTask);
+    socket.on("task_updated", handleTaskUpdated);
+    socket.on("task_deleted", handleTaskDeleted);
+    socket.on("project_deleted", handleProjectDeleted);
+
+    return () => {
+      socket.off("new_task", handleNewTask);
+      socket.off("task_updated", handleTaskUpdated);
+      socket.off("task_deleted", handleTaskDeleted);
+      socket.off("project_deleted", handleProjectDeleted);
+    };
+  }, [user, socket]);
   return (
     <div className="w-full h-full flex-col space-y-8 p-6">
       <div className="flex items-center justify-between space-y-2">

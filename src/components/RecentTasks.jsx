@@ -60,8 +60,7 @@ export default function RecentTasks({ tasks = [] }) {
                   </Avatar>
                   <div className="flex-1 space-y-1">
                     <p className="text-sm font-medium leading-none">
-                      {task.title} akldflajsd ldjfl asldjfl sdljflasjdlfjasd
-                      ljsdjfs afkdlfjdsl jsdlk
+                      {task.title}
                     </p>
                     <div className="flex items-center text-xs text-muted-foreground">
                       <Clock className="mr-1 h-3 w-3" />

@@ -27,6 +27,25 @@ export default function GlobalContext({ children }) {
   const [activeUsers, setActiveUsers] = useState([]);
 
   useEffect(() => {
+    if (!user) return;
+
+    const handleNewTask = (data) => {
+      if (data.task.assignedTo._id === user._id) {
+        toast.info(data.message, {
+          duration: 8000,
+          description: data?.description,
+        });
+      }
+    };
+
+    socket.on("new_task", handleNewTask);
+
+    return () => {
+      socket.off("new_task", handleNewTask);
+    };
+  }, [user, socket]);
+
+  useEffect(() => {
     if (sessionStorage.getItem("accessToken")) {
       socket.on("active_users", (users) => {
         setActiveUsers(users);
@@ -51,7 +70,6 @@ export default function GlobalContext({ children }) {
       }));
       setPermissions(data.role.permissions);
     });
-
     socket.on("workshop_deleted", () => {
       toast.error("This workshop has been deleted by the owner", {
         description: "Please select another workshop",
@@ -63,7 +81,7 @@ export default function GlobalContext({ children }) {
       socket.off("new_message");
       socket.off("user_disconnected");
     };
-  }, [socket]);
+  }, [user, socket]);
 
   return (
     <MainContext.Provider

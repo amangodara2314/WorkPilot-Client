@@ -17,7 +17,7 @@ import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 
 export default function Project() {
-  const { currentWorkshop, permissions } = useGlobalContext();
+  const { currentWorkshop, permissions, user } = useGlobalContext();
   const params = useParams();
   const [tasks, setTasks] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -90,28 +90,54 @@ export default function Project() {
   }, [error]);
 
   useEffect(() => {
-    socket.on("new_task", (data) => {
-      if (params.projectId == data.task.project) {
-        fetchTasks();
-        refetch();
-      }
-      toast.info(data.message, {
-        duration: 8000,
-        description: data?.description,
-      });
-    });
-    socket.on("task_updated", (data) => {
-      if (params.projectId == data.project) {
-        fetchTasks();
-      }
-    });
+    if (!user) return;
 
-    socket.on("project_updated", (data) => {
-      if (params.projectId == data?._id) {
+    const handleNewTask = (data) => {
+      console.log(user, data);
+      if (
+        params.projectId === data.task.project &&
+        (user.role === "Member" ? data.task.assignedTo._id === user._id : true)
+      ) {
+        fetchTasks();
         refetch();
       }
-    });
-  }, [socket]);
+    };
+
+    const handleTaskUpdated = (data) => {
+      if (
+        params.projectId === data.project &&
+        (user.role === "Member" ? data.assignedTo._id === user._id : true)
+      ) {
+        fetchTasks();
+      }
+    };
+
+    const handleProjectUpdated = (data) => {
+      if (params.projectId === data?._id) {
+        refetch();
+      }
+    };
+    const handleTaskDeleted = (data) => {
+      if (
+        params.projectId === data.task.project &&
+        (user.role === "Member" ? data.task.assignedTo._id === user._id : true)
+      ) {
+        refetch();
+        fetchTasks();
+      }
+    };
+
+    socket.on("new_task", handleNewTask);
+    socket.on("task_updated", handleTaskUpdated);
+    socket.on("project_updated", handleProjectUpdated);
+    socket.on("task_deleted", handleTaskDeleted);
+
+    return () => {
+      socket.off("new_task", handleNewTask);
+      socket.off("task_updated", handleTaskUpdated);
+      socket.off("project_updated", handleProjectUpdated);
+    };
+  }, [user, params.projectId, socket]);
 
   return (
     <div className="flex flex-col">

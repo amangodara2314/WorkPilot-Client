@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import socket from "@/lib/socket";
 
-export default function DeleteTask({ id, refetch }) {
+export default function DeleteTask({ id, refetch, task }) {
   const { API, currentWorkshop } = useGlobalContext();
   const navigate = useNavigate();
 
@@ -29,6 +29,7 @@ export default function DeleteTask({ id, refetch }) {
         }
         socket.emit("task_deleted", {
           taskId: id,
+          task: task,
           workshopId: currentWorkshop,
         });
         refetch();
