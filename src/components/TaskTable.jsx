@@ -130,6 +130,7 @@ export default function TaskTable({
               isEditing={true}
               onClose={() => setSelectedTask(null)}
               setTasks={setTasks}
+              callback={refetch}
             />
           </div>
         </div>
@@ -145,6 +146,7 @@ export default function TaskTable({
           columns={columns}
           setColumns={setColumns}
           resetFilters={resetFilters}
+          refetch={refetch}
         />
 
         <div className="rounded-md border">

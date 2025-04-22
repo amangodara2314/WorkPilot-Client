@@ -55,6 +55,7 @@ const useFetch = (
         setData(result);
         return result;
       } catch (err) {
+        console.log(error);
         setError(err.message);
         return null;
       } finally {

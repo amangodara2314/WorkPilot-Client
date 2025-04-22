@@ -135,7 +135,9 @@ export default function Tasks() {
             Here&apos;s the list of tasks for this workspace!
           </p>
         </div>
-        {permissions && permissions?.task.includes("create") && <TaskDialog />}
+        {permissions && permissions?.task.includes("create") && (
+          <TaskDialog refetch={refetch} />
+        )}
       </div>
       <TaskTable
         tasks={tasks}
@@ -157,7 +159,6 @@ export default function Tasks() {
         hasNextPage={hasNextPage}
         setTasks={setTasks}
       />
-      <div></div>
     </div>
   );
 }

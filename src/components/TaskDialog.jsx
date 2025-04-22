@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import CreateEditTaskForm from "./CreateEditTask";
-const TaskDialog = (props) => {
+const TaskDialog = ({ refetch }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -26,7 +26,10 @@ const TaskDialog = (props) => {
         </DialogTrigger>
 
         <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-          <CreateEditTaskForm onClose={() => setIsOpen(false)} />
+          <CreateEditTaskForm
+            onClose={() => setIsOpen(false)}
+            callback={refetch}
+          />
         </DialogContent>
       </Dialog>
     </div>

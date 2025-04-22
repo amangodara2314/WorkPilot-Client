@@ -153,7 +153,7 @@ export default function CreateEditTaskForm({
           task: res.task,
         });
       }
-      callback(res);
+      callback();
       toast.success(`Task ${isEditing ? "updated" : "created"} successfully!`);
       setTimeout(() => {
         form.reset();
