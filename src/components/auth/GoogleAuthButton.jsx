@@ -26,7 +26,8 @@ export default function GoogleAuthButton({ type, redirect = "" }) {
           body: JSON.stringify({ code: response["code"] }),
         });
         const data = await res.json();
-        if (res.status != 201) {
+        console.log(data);
+        if (res.status != 200) {
           toast.error(data.message);
           return;
         } else {
